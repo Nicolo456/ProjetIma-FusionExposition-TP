@@ -4,9 +4,9 @@ from fs_func import open_image, save_image
 from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter
 
 
-def calc_weight_map(contrast_weight_map, saturation_weight_map, well_exposedness_weight_map, contrast_power=0.5, saturation_power=0.5, well_exposedness_power=0.5, show=False, img=None):
-    weight_map = contrast_weight_map ** contrast_power * saturation_weight_map ** saturation_power * \
-        well_exposedness_weight_map ** well_exposedness_power
+def calc_weight_map(contrast_weight_map, saturation_weight_map, well_exposedness_weight_map, contrast_power=0, saturation_power=0, well_exposedness_power=1, show=False, img=None):
+    weight_map = (contrast_weight_map ** contrast_power) * (saturation_weight_map **
+                                                            saturation_power) * (well_exposedness_weight_map ** well_exposedness_power)
 
     if show == True and img is not None:
         show_image(img, img1_title='Original Image', img2=weight_map,
@@ -18,8 +18,10 @@ def calc_weight_map(contrast_weight_map, saturation_weight_map, well_exposedness
 
 def get_weight_map(img, show=False):
     img_grayscale = apply_grayscale(img)
+
+    # Compute the weight map, for each filter we want to normalize it between 0 and 1
     contrast_weight_map = apply_contrast_filter(img_grayscale, show=show)
-    saturation_weight_map = apply_saturation_filter(img, show=show)
+    saturation_weight_map = apply_saturation_filter(img, show=show) / 120.3
     well_exposedness_weight_map = apply_well_exposedness_filter(
         img, show=show)
     weight_map = calc_weight_map(
@@ -36,11 +38,11 @@ def get_weight_maps(imgs, show=False):
 
 def normalize_weight_maps(weight_maps, verbose=False):
     # Epsilon is a small value to avoid division by zero
-    epsilon = 1e-20 * np.ones_like(weight_maps[0])
+    epsilon = 1e-10 * np.ones_like(weight_maps[0])
 
     px_sum_weight_maps = np.sum(weight_maps, axis=0) + epsilon
 
-    # Si tous les poids sont nuls, alors le poids de chaque pixel sera égal à 1/3
+    # Si tous les poids sont nuls, alors le poids de chaque pixel sera réparti entre les images
     normalized_weight_maps = [
         np.divide(weight_map + epsilon/len(imgs), px_sum_weight_maps) for weight_map in weight_maps]
 
@@ -80,13 +82,13 @@ def naive_fusion(imgs, show=False):
 
 
 if __name__ == "__main__":
-    # Open an image with numpy, show it with matplotlib
+    """ # Open an image with numpy, show it with matplotlib
     img_m = open_image("img/venise/MeanSat.jpg")
     img_o = open_image("img/venise/OverSat.jpg")
     img_u = open_image("img/venise/UnderSat.jpg")
     imgs = [img_m, img_o, img_u]
 
-    fused_image = naive_fusion(imgs, show=True)
+    fused_image = naive_fusion(imgs, show=False)
 
     # Chargement image du papier
     img_p = open_image("img/venise/Result.jpg")
@@ -97,3 +99,29 @@ if __name__ == "__main__":
 
     # Save the fused image
     save_image(fused_image, "img/venise/fused_image.jpg")
+
+    # ============== Other example ===============
+    imgs = []
+    for i in range(4):
+        imgs.append(open_image(f"img/chamber/iso{i + 1}.jpg"))
+
+    fused_image = naive_fusion(imgs, show=False)
+
+    # Chargement image du papier
+    img_p = open_image("img/chamber/naive_paper_result.jpg")
+
+    # Afficher l'image fusionnée
+    show_image(img_p, img1_title='Image issue du papier',
+               img2=fused_image, img2_title='Image issue de notre fusion naive')
+
+    # Save the fused image
+    save_image(fused_image, "img/chamber/fused_image.jpg") """
+
+    imgs = []
+    for k in range(259, 266):
+        imgs.append(open_image(f"img/perso_dams/DSC08{k}.tiff"))
+
+    fused_image = naive_fusion(imgs, show=False)
+
+    # Save the fused image
+    save_image(fused_image, "img/perso_dams/fused_image.jpg")

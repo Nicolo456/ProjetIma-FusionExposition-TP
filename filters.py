@@ -30,10 +30,6 @@ def apply_contrast_filter(img_grayscale, show=False):
     # Take the absolute value to get rid of negative values
     laplacian_filtered = np.absolute(laplacian_filtered)
 
-    # Normalize to uint8 (0-255)
-    laplacian_filtered = np.uint8(
-        255 * (laplacian_filtered / np.max(laplacian_filtered)))
-
     if show == True:
         # Display the original and the filtered image
         show_image(img_grayscale, img1_title='Original Image', is_im1_grey=True,
@@ -43,16 +39,17 @@ def apply_contrast_filter(img_grayscale, show=False):
 
 def apply_saturation_filter(img_colored, show=False):
     '''As a photograph undergoes a longer exposure, the resulting colors become desaturated and eventually clipped. Saturated colors are desirable and make the image look vivid. We include a saturation measure S, which is computed as the standard deviation within the R, G and B channel, at each pixel.'''
-    # Extract the R, G, B channels
+
+    """ # Extract the R, G, B channels
     R = img_colored[:, :, 0]
     G = img_colored[:, :, 1]
     B = img_colored[:, :, 2]
 
     # Stack the R, G, B channels along the last axis
-    rgb_stack = np.stack((R, G, B), axis=-1)
+    rgb_stack = np.stack((R, G, B), axis=-1) """
 
     # Compute the standard deviation across the R, G, B channels for each pixel
-    saturation_map = np.std(rgb_stack, axis=-1)
+    saturation_map = np.std(img_colored, axis=-1)
 
     if show == True:
         show_image(img_colored, img1_title='Original Image',
