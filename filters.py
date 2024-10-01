@@ -87,3 +87,4 @@ def apply_well_exposedness_filter(img_colored, show=False, sigma=0.2):
         show_image(img_colored, img1_title='Original Image', img2=we_map,
                    img2_title='Well-Exposedness Map', is_im2_grey=True)
     return we_map
+
