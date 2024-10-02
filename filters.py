@@ -14,21 +14,7 @@ def apply_contrast_filter(img_grayscale, show=False):
     This yields a simple indicator C for contrast. It tends to assign a high weight to important elements such as edges and texture.
     A similar measure was used for multi-focus fusion for extended depth-of-field [19]'''
 
-    # Define the Laplacian kernel (3x3)
-    laplacian_kernel = np.array([[0, -1, 0],
-                                [-1, 4, -1],
-                                [0, -1, 0]])
-
-    # other possibel kernels:
-    laplacian_kernel_bis = np.array([[-1, -1, -1],
-                                     [-1, 8, -1],
-                                     [-1, -1, -1]])
-
-    # Apply the Laplacian filter using convolution
-    laplacian_filtered = ndimage.convolve(img_grayscale, laplacian_kernel)
-
-    # Take the absolute value to get rid of negative values
-    laplacian_filtered = np.absolute(laplacian_filtered)
+    laplacian_filtered = ndimage.laplace(img_grayscale)
 
     if show == True:
         # Display the original and the filtered image
