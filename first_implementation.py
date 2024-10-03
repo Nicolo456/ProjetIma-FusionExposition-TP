@@ -82,13 +82,13 @@ def naive_fusion(imgs, show=False):
 
 
 if __name__ == "__main__":
-    """ # Open an image with numpy, show it with matplotlib
+     # Open an image with numpy, show it with matplotlib
     img_m = open_image("img/venise/MeanSat.jpg")
     img_o = open_image("img/venise/OverSat.jpg")
     img_u = open_image("img/venise/UnderSat.jpg")
     imgs = [img_m, img_o, img_u]
 
-    fused_image = naive_fusion(imgs, show=False)
+    fused_image = naive_fusion(imgs, show=True)
 
     # Chargement image du papier
     img_p = open_image("img/venise/Result.jpg")
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     # Save the fused image
     save_image(fused_image, "img/venise/fused_image.jpg")
-
+    """
     # ============== Other example ===============
     imgs = []
     for i in range(4):
@@ -115,7 +115,7 @@ if __name__ == "__main__":
                img2=fused_image, img2_title='Image issue de notre fusion naive')
 
     # Save the fused image
-    save_image(fused_image, "img/chamber/fused_image.jpg") """
+    save_image(fused_image, "img/chamber/fused_image.jpg") 
 
     imgs = []
     for k in range(259, 266):
@@ -125,3 +125,4 @@ if __name__ == "__main__":
 
     # Save the fused image
     save_image(fused_image, "img/perso_dams/fused_image.jpg")
+    """

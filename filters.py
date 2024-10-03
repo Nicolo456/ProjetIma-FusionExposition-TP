@@ -15,6 +15,7 @@ def apply_contrast_filter(img_grayscale, show=False):
     A similar measure was used for multi-focus fusion for extended depth-of-field [19]'''
 
     laplacian_filtered = ndimage.laplace(img_grayscale)
+    laplacian_filtered = np.absolute(laplacian_filtered)
 
     if show == True:
         # Display the original and the filtered image
