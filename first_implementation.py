@@ -1,5 +1,5 @@
 import numpy as np
-from display_func import show_image
+from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR
 from fs_func import open_image, save_image
 from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter
 

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import cv2
 
 
 def show_image(img1, img1_title='Original Image', is_im1_grey=False, img2=None, img2_title='Filtered Image', is_im2_grey=False):
@@ -31,3 +32,17 @@ def show_image(img1, img1_title='Original Image', is_im1_grey=False, img2=None, 
             plt.imshow(img1)
 
     plt.show()
+
+
+def show_image_cv2(im, title = "Image"):          #cv2 travaille au format BGR et pas RGB 
+    cv2.imshow(title, im)
+    cv2.waitKey(0)              #0 attend l'appui d'une touche pour continuer, on peut mettre un temps en ms
+
+
+def BGR2RGB(img):
+    image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    return image_rgb
+
+def RGB2BGR(img):
+    image_rgb = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    return image_rgb
