@@ -27,11 +27,24 @@ def pyramid_up(im_down, floors = 0, show = False):
             show_image_cv2(higher)
     return pyr
 
+def laplacian_pyramid(im, floors = 3, show = False):
+    pyr = []
+    pyr_down = pyramid_down(im, floors = floors)
+    last_floor = pyr_down[floors-1]
+    pyr_up = pyramid_up(last_floor, floors = floors)
+    for i in range(floors-1):
+        lapl_im = cv2.subtract(pyr_down[i],pyr_up[floors-i-1])
+        pyr.append(lapl_im)
+        if show:
+            show_image_cv2(lapl_im)
+    return pyr
 
 
 """
 #Tests
 img = cv2.imread('img/venise/MeanSat.jpg')
+laplacian_pyramid(img,5,show=True)
+
 pyr_down = pyramid_down(img,4,True)
 N = len(pyr_down)
 pyr_up = pyramid_up(pyr_down[N-1],show = True)
