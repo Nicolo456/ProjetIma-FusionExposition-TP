@@ -44,7 +44,7 @@ def normalize_weight_maps(weight_maps, verbose=False):
 
     # Si tous les poids sont nuls, alors le poids de chaque pixel sera réparti entre les images
     normalized_weight_maps = [
-        np.divide(weight_map + epsilon/len(imgs), px_sum_weight_maps) for weight_map in weight_maps]
+        np.divide(weight_map + epsilon/len(weight_maps), px_sum_weight_maps) for weight_map in weight_maps]
 
     if verbose:
         print("\nSum of Normalized weight maps:")
@@ -79,50 +79,3 @@ def naive_fusion(imgs, show=False):
     fused_image = fuse_images(imgs, n_weight_maps)
 
     return fused_image
-
-
-if __name__ == "__main__":
-     # Open an image with numpy, show it with matplotlib
-    img_m = open_image("img/venise/MeanSat.jpg")
-    img_o = open_image("img/venise/OverSat.jpg")
-    img_u = open_image("img/venise/UnderSat.jpg")
-    imgs = [img_m, img_o, img_u]
-
-    fused_image = naive_fusion(imgs, show=True)
-
-    # Chargement image du papier
-    img_p = open_image("img/venise/Result.jpg")
-
-    # Afficher l'image fusionnée
-    show_image(img_p, img1_title='Image issue du papier',
-               img2=fused_image, img2_title='Image issue de notre fusion naive')
-
-    # Save the fused image
-    save_image(fused_image, "img/venise/fused_image.jpg")
-    """
-    # ============== Other example ===============
-    imgs = []
-    for i in range(4):
-        imgs.append(open_image(f"img/chamber/iso{i + 1}.jpg"))
-
-    fused_image = naive_fusion(imgs, show=False)
-
-    # Chargement image du papier
-    img_p = open_image("img/chamber/naive_paper_result.jpg")
-
-    # Afficher l'image fusionnée
-    show_image(img_p, img1_title='Image issue du papier',
-               img2=fused_image, img2_title='Image issue de notre fusion naive')
-
-    # Save the fused image
-    save_image(fused_image, "img/chamber/fused_image.jpg") 
-
-    imgs = []
-    for k in range(259, 266):
-        imgs.append(open_image(f"img/perso_dams/DSC08{k}.tiff"))
-
-    fused_image = naive_fusion(imgs, show=False)
-
-    # Save the fused image
-    save_image(fused_image, "img/perso_dams/fused_image.jpg")
-    """

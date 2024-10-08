@@ -15,8 +15,6 @@ def pyramid_down(im, floors = 3, show = False):
     return pyr
 
 def pyramid_up(im_down, floors = 0, show = False):
-    if floors ==0:
-        floors = len(pyr_down)
     pyr = [im_down]
     if show == True:
         show_image_cv2(im_down)
@@ -27,17 +25,22 @@ def pyramid_up(im_down, floors = 0, show = False):
             show_image_cv2(higher)
     return pyr
 
-def laplacian_pyramid(im, floors = 3, show = False):
-    pyr = []
+def laplacian_pyramid(im, floors = 3, show = False, rgb = True):
     pyr_down = pyramid_down(im, floors = floors)
     last_floor = pyr_down[floors-1]
+    pyr = [last_floor]
     pyr_up = pyramid_up(last_floor, floors = floors)
     for i in range(floors-1):
         lapl_im = cv2.subtract(pyr_down[i],pyr_up[floors-i-1])
         pyr.append(lapl_im)
         if show:
             show_image_cv2(lapl_im)
-    return pyr
+    if rgb:
+        for i in range(floors):
+            pyr[i] = BGR2RGB(pyr[i])
+            pyr_down[i] = BGR2RGB(pyr[i])
+            pyr_up[i] = BGR2RGB(pyr[i])
+    return pyr, pyr_down, pyr_up
 
 
 """
@@ -47,7 +50,7 @@ laplacian_pyramid(img,5,show=True)
 
 pyr_down = pyramid_down(img,4,True)
 N = len(pyr_down)
-pyr_up = pyramid_up(pyr_down[N-1],show = True)
+pyr_up = pyramid_up(pyr_down[N-1], 4, show = True)
 """
 
 
