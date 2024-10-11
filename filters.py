@@ -2,7 +2,6 @@ import numpy as np
 from scipy import ndimage
 from display_func import show_image
 
-
 def apply_grayscale(img):
     # Convert the image to grayscale
     img_grayscale = np.dot(img[..., :3], [0.2989, 0.5870, 0.1140])

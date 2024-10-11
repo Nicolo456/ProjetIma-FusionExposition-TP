@@ -14,7 +14,7 @@ def pyramid_down(im, floors = 3, show = False):
             show_image_cv2(lower)
     return pyr
 
-def pyramid_up(im_down, floors = 0, show = False):
+def pyramid_up(im_down, floors = 3, show = False):
     pyr = [im_down]
     if show == True:
         show_image_cv2(im_down)
@@ -47,7 +47,6 @@ def laplacian_pyramid(im, floors = 3, show = False, rgb = True):
 #Tests
 img = cv2.imread('img/venise/MeanSat.jpg')
 laplacian_pyramid(img,5,show=True)
-
 pyr_down = pyramid_down(img,4,True)
 N = len(pyr_down)
 pyr_up = pyramid_up(pyr_down[N-1], 4, show = True)
