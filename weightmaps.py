@@ -1,10 +1,10 @@
 import numpy as np
-from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR
+from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
 from fs_func import open_image, save_image
 from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter
 
 
-def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=0, saturation_power=0, well_exposedness_power=1, show=False, img=None):
+def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
     wm = (contrast_wm ** contrast_power) * (saturation_wm **
                                                             saturation_power) * (well_exposedness_wm ** well_exposedness_power)
 
@@ -57,19 +57,24 @@ def normalize_wms(wms, verbose=False):
 
 
 def fuse_images(imgs, normalized_wms):
-    print("imgs", imgs)
     # Copy the weight on every channel
     normalized_wms_3d = [np.stack(
         [normalized_wm] * 3, axis=-1) for normalized_wm in normalized_wms]
 
+    """ print("======================================================= normalized_wms_3d")
+    inspect_list_structure(normalized_wms_3d)
+    print("======================================================= imgs")
+    inspect_list_structure(imgs)"""
+    
     # Fusionner les images en utilisant les poids normalisés
-    print("zip",list(zip(normalized_wms_3d, imgs)))    #tableau de (a,b) où a est une wm et b une liste d'images pour notre pb
+    #print("zip",list(zip(normalized_wms_3d, imgs)))    #tableau de (a,b) où a est une wm et b une liste d'images pour notre pb
     fused_image = np.sum(
         [normalized_wm_3d * img for normalized_wm_3d, img in zip(normalized_wms_3d, imgs)], axis=0)
 
-    clipped_fused_image = np.clip(
-        fused_image, 0, 255).astype(np.uint8)
+    clipped_fused_image = np.clip(fused_image, 0, 255).astype(np.uint8)
 
+    print("======================================================= fused_image")
+    inspect_list_structure(clipped_fused_image)
     return clipped_fused_image
 
 

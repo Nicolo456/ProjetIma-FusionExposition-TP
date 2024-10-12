@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import cv2
-
+import numpy as np
 
 def show_image(img1, img1_title='Original Image', is_im1_grey=False, img2=None, img2_title='Filtered Image', is_im2_grey=False):
     if img2 is not None:
@@ -46,3 +46,31 @@ def BGR2RGB(img):
 def RGB2BGR(img):
     image_rgb = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     return image_rgb
+
+def inspect_list_structure(lst, level=1):
+    """Inspect the structure of a list, identifying arrays, sublists, and other types."""
+    """List of length 4
+        Element 0:
+            Numpy Array with shape (64, 64, 3), dtype float64
+        Element 1:
+            List of length 2
+            Element 0:
+                Numpy Array with shape (28, 28), dtype float64
+            Element 1:
+                Numpy Array with shape (28, 28), dtype float64
+        Element 2:
+            int: 42
+        Element 3:
+            str: Hello World"""
+
+    indent = "  " * level  # Indentation for better readability
+    if isinstance(lst, list) or isinstance(lst, tuple):
+        print(f"{indent}List of length {len(lst)}")
+        for i, item in enumerate(lst):
+            print(f"{indent}  Element {i}")
+            inspect_list_structure(item, level + 1)  # Recursion for sublists
+    elif isinstance(lst, np.ndarray):
+        print(f"{indent}Numpy Array with shape {lst.shape}, dtype {lst.dtype}")
+    else:
+        print(f"{indent}{type(lst).__name__}: {lst}")
+
