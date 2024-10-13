@@ -5,6 +5,10 @@ from filters import apply_contrast_filter, apply_grayscale, apply_saturation_fil
 
 
 def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
+    """Return a weight map for an image
+    @params: img: image (np.array)
+    @return: weight map (np.array)"""
+
     wm = (contrast_wm ** contrast_power) * (saturation_wm **
                                             saturation_power) * (well_exposedness_wm ** well_exposedness_power)
 
@@ -17,6 +21,10 @@ def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, s
 
 
 def get_wm(img, show=False):
+    """Return a weight map for an image
+    @params: img: image (np.array)
+    @return: weight map (np.array)"""
+
     img_grayscale = apply_grayscale(img)
 
     # Compute the weight map, for each filter we want to normalize it between 0 and 1
@@ -29,14 +37,30 @@ def get_wm(img, show=False):
     return wm
 
 
-def get_wms(imgs, show=False):
+def get_wms(imgs, show=False, forceFloat=True):
+    """Return a list of weight maps for each image
+
+    @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: show: bool, if True, show the weight map of the first image
+    @params: forceFloat: bool, if True, return the weight map as a float64
+
+    @return: [image (np.array)] a list of weight map"""
+
     wms = []
     for img in imgs:
         wms.append(get_wm(img, show=show))
+
+    if forceFloat:
+        wms = [wm.astype(np.float32) for wm in wms]
     return wms
 
 
 def normalize_wms(wms, verbose=False):
+    """Normalize the weight map
+    @params: wms: [image (np.array)] a list of weight map
+    @params: verbose: bool, if True, print the sum of the weight map
+    @return: [image (np.array)] a list of normalized weight map"""
+
     # Epsilon is a small value to avoid division by zero
     epsilon = 1e-10 * np.ones_like(wms[0])
 
@@ -56,29 +80,36 @@ def normalize_wms(wms, verbose=False):
     return normalized_wms
 
 
-def fuse_images(imgs, normalized_wms):
+def fuse_images(imgs, normalized_wms, forceInt=False):
+    """Fusionner les images en utilisant les poids normalisés
+    @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: normalized_wms: [image (np.array)] a list of normalized weight map
+    @return: image (np.array) the fused image"""
+
     # Copy the weight on every channel
     normalized_wms_3d = [np.stack(
         [normalized_wm] * 3, axis=-1) for normalized_wm in normalized_wms]
 
-    """ print("======================================================= normalized_wms_3d")
-    inspect_list_structure(normalized_wms_3d)
-    print("======================================================= imgs")
-    inspect_list_structure(imgs)"""
-
     # Fusionner les images en utilisant les poids normalisés
-    # print("zip",list(zip(normalized_wms_3d, imgs)))    #tableau de (a,b) où a est une wm et b une liste d'images pour notre pb
+    # print("zip",list(zip(normalized_wms_3d, imgs)))
+    # tableau de (a,b) où a est une wm et b une liste d'images pour notre pb
+
     fused_image = np.sum(
         [normalized_wm_3d * img for normalized_wm_3d, img in zip(normalized_wms_3d, imgs)], axis=0)
 
-    clipped_fused_image = np.clip(fused_image, 0, 255).astype(np.uint8)
+    clipped_fused_image = np.clip(fused_image, 0, 255)
+    if forceInt:
+        clipped_fused_image = clipped_fused_image.astype(np.uint8)
 
-    """print("======================================================= fused_image")
-    inspect_list_structure(clipped_fused_image)"""
     return clipped_fused_image
 
 
 def naive_fusion(imgs, show=False):
+    """Naive fusion of images
+    @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: show: bool, if True, show the weight map of the first image
+    @return: image (np.array) the fused image"""
+
     wms = get_wms(imgs, show=show)
 
     n_wms = normalize_wms(wms, verbose=show)
