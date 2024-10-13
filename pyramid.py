@@ -3,18 +3,20 @@ import matplotlib.pyplot as plt
 from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
 
 
-def pyramid_down(im, floors = 3, show = False):
+def pyramid_down(im, floors=3, show=False):
     pyr = [im]
     if show == True:
         show_image_cv2(im)
     for i in range(floors-1):
+
         lower = cv2.pyrDown(pyr[i])
         pyr.append(lower)
         if show == True:
             show_image_cv2(lower)
     return pyr
 
-def pyramid_up(im_down, floors = 3, show = False):
+
+def pyramid_up(im_down, floors=3, show=False):
     pyr = [im_down]
     if show == True:
         show_image_cv2(im_down)
@@ -25,15 +27,16 @@ def pyramid_up(im_down, floors = 3, show = False):
             show_image_cv2(higher)
     return pyr
 
-def laplacian_pyramid(im, floors = 3, show = False, rgb = True):
-    pyr_down = pyramid_down(im, floors = floors)
-    
+
+def laplacian_pyramid(im, floors=3, show=False, rgb=True):
+    pyr_down = pyramid_down(im, floors=floors)
+
     last_floor = pyr_down[floors-1]
     pyr = []
-    pyr_up = pyramid_up(last_floor, floors = floors)
+    pyr_up = pyramid_up(last_floor, floors=floors)
 
     for i in range(floors-1):
-        lapl_im = cv2.subtract(pyr_down[i],pyr_up[floors-i-1])
+        lapl_im = cv2.subtract(pyr_down[i], pyr_up[floors-i-1])
         pyr.append(lapl_im)
         if show:
             show_image_cv2(lapl_im)
@@ -54,5 +57,3 @@ pyr_down = pyramid_down(img,4,True)
 N = len(pyr_down)
 pyr_up = pyramid_up(pyr_down[N-1], 4, show = True)
 """
-
-
