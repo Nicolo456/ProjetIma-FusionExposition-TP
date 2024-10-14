@@ -1,7 +1,7 @@
 import numpy as np
 from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
 from fs_func import open_image, save_image
-from weightmaps import get_wms, normalize_wms, fuse_images
+from weightmaps import get_wms, normalize_wms, fuse_and_sum_images
 from pyramid import pyramid_down, reconstruct_from_lpyr, laplacian_pyramid
 
 # TODO: Mettre des s partout au pyr parce que y en a plusieurs
@@ -24,10 +24,8 @@ def make_fused_summed_pyr(imgs, show=False, floors=3):
     wms_pyrg = [pyramid_down(wm) for wm in wms]
     sorted_n_wms_pyr = get_sorted_n_wms_pyrs(wms_pyrg)
 
-    sorted_fused_pyrs = get_sorted_fused_pyrs(
+    fused_summed_pyr = get_fused_summed_pyr(
         sorted_n_wms_pyr, sorted_imgs_pyrl)
-
-    fused_summed_pyr = get_fused_summed_pyr(sorted_fused_pyrs)
 
     if show:
         for i in range(len(fused_summed_pyr)):
@@ -59,32 +57,27 @@ def get_sorted_n_wms_pyrs(wms_pyrs):
     return sorted_n_wms_pyrs
 
 
-def get_sorted_fused_pyrs(sorted_n_wms_pyr, sorted_imgs_pyrl):
+def get_fused_summed_pyr(sorted_n_wms_pyr, sorted_imgs_pyrl):
     """Return a list of all lists representing the floor. Each floor_group contain the floor of each fusion of weight_map and image pyramid
 
     @params: sorted_n_wms_pyrs: [[image (np.array)]] a list of floor_group with normalised weight map of the floor (one by pyramid)
     @params: sorted_imgs_pyrl: [[image (np.array)]] a list of floor_group with image pyramid of the floor (one by pyramid)
     @return: [[image (np.array)]] a list of floor_group with fused image of the floor (one by pyramid)"""
 
-    sorted_fused_pyrs = list(map(fuse_images, sorted_imgs_pyrl,
-                                 sorted_n_wms_pyr))  # On applique fuse image sur chaque pyramide
-
-    return sorted_fused_pyrs
-
-
-def get_fused_summed_pyr(sorted_fused_pyr):
-    """On prend une liste de pyramide qu'on va mélanger avec une addition par étage
-    @params: sorted_fused_pyr: [[image (np.array)]]"""
-
     fused_summed_pyr = []
-    for pyr in sorted_fused_pyr:
-        fused_summed_pyr.append(np.sum(pyr, axis=0))
 
-    # fused_summed_pyr = list(map(lambda x: np.sum(x, axis=0), sorted_fused_pyr))
+    assert len(sorted_n_wms_pyr) == len(
+        sorted_imgs_pyrl), "Les pyramides ne sont pas de la même taille"
+    for i_floor in range(len((sorted_n_wms_pyr))):
+        # On applique fuse image sur chaque pyramide
+        fused_summed_pyr.append(fuse_and_sum_images(sorted_imgs_pyrl[i_floor],
+                                                    sorted_n_wms_pyr[i_floor]))
+
+    # fused_summed_pyr = list(map(fuse_and_sum_images, sorted_imgs_pyrl, sorted_n_wms_pyr))  # On applique fuse image sur chaque pyramide => optimised version
     return fused_summed_pyr
 
 
-def get_exposition_fused_image(imgs, show=False):
+def get_exposition_fused_image(imgs, show=False, clip=True):
     """Wrapper used to execute the paper algorithme
 
     @params: imgs: [image (np.array)] a list of image with different exposure
@@ -93,10 +86,14 @@ def get_exposition_fused_image(imgs, show=False):
     # Execute the wrapper for the pyramid
     fused_summed_pyr = make_fused_summed_pyr(imgs, show=False)
 
-    # fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
-    final_image = reconstruct_from_lpyr(fused_summed_pyr)
-    # final_image_rgb = BGR2RGB(final_image)
+    fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
+    final_image = reconstruct_from_lpyr(fused_summed_pyr_bgr)
+    final_image = BGR2RGB(final_image)
+
+    if clip:
+        final_image = np.clip(final_image, 0, 255).astype(np.uint8)
     if show:
+        print("DEBGUG:")
         show_image(final_image, img1_title='Final image')
     return final_image
 

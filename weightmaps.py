@@ -80,8 +80,8 @@ def normalize_wms(wms, verbose=False):
     return normalized_wms
 
 
-def fuse_images(imgs, normalized_wms, forceInt=False):
-    """Fusionner les images en utilisant les poids normalisés
+def fuse_and_sum_images(imgs, normalized_wms, forceInt=False):
+    """Fusionner et sommed les images en utilisant les poids normalisés
     @params: imgs: [image (np.array)] a list of image with different exposure
     @params: normalized_wms: [image (np.array)] a list of normalized weight map
     @return: image (np.array) the fused image"""
