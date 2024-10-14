@@ -7,13 +7,16 @@ from pyramid import pyramid_down, reconstruct_from_lpyr, laplacian_pyramid
 # TODO: Mettre des s partout au pyr parce que y en a plusieurs
 
 
-def make_fused_summed_pyr(imgs, show=False, floors=3):
+def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
     """Wrapper used to generate the final pyramid like the paper
 
     @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: power_coef: [float] a list of power coefficient for each weight map
+        [contrast_power, saturation_power, well_exposedness_power]
+    @params: show: bool, if True, show the weight map of the first image
     @return: [[image (np.array)]] a pyramid of the final image"""
 
-    wms = get_wms(imgs, show=show, forceFloat=True)
+    wms = get_wms(imgs, power_coef, show=show, forceFloat=True)
 
     imgs = [img.astype(np.float32) for img in imgs]
 
@@ -77,10 +80,12 @@ def get_fused_summed_pyr(sorted_n_wms_pyr, sorted_imgs_pyrl):
     return fused_summed_pyr
 
 
-def get_exposition_fused_image(imgs, show=False, clip=True, floors=3):
+def get_exposition_fused_image(imgs, power_coef, show=False, clip=True, floors=3):
     """Wrapper used to execute the paper algorithme
 
     @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: power_coef: [float] a list of power coefficient for each weight map
+        [contrast_power, saturation_power, well_exposedness_power]
     @return: image (np.array) the final image"""
 
     i = floors - 1
@@ -89,7 +94,8 @@ def get_exposition_fused_image(imgs, show=False, clip=True, floors=3):
     assert imgs[0].shape[0] % 2**i == 0 and imgs[0].shape[1] % 2**i == 0, error_msg
 
     # Execute the wrapper for the pyramid
-    fused_summed_pyr = make_fused_summed_pyr(imgs, show=False, floors=floors)
+    fused_summed_pyr = make_fused_summed_pyr(
+        imgs, power_coef, show=False, floors=floors)
 
     fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
     final_image = reconstruct_from_lpyr(fused_summed_pyr_bgr)
@@ -110,5 +116,9 @@ if __name__ == "__main__":
     img_u = open_image("img/venise/UnderSat.jpg")
     imgs = [img_m, img_o, img_u]
 
-    final_image = get_exposition_fused_image(imgs, show=False, floors=5)
+    # [contrast_power, saturation_power, well_exposedness_power]
+    power_coef = [0, 1, 0]
+
+    final_image = get_exposition_fused_image(
+        imgs, power_coef, show=False, floors=5)
     show_image(final_image, img1_title='Final image')

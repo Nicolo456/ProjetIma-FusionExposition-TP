@@ -20,7 +20,7 @@ def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, s
     return wm
 
 
-def get_wm(img, show=False):
+def get_wm(img, power_coef, show=False):
     """Return a weight map for an image
     @params: img: image (np.array)
     @return: weight map (np.array)"""
@@ -33,11 +33,11 @@ def get_wm(img, show=False):
     well_exposedness_wm = apply_well_exposedness_filter(
         img, show=show)
     wm = calc_wm(
-        contrast_wm, saturation_wm, well_exposedness_wm, show=show, img=img)
+        contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
     return wm
 
 
-def get_wms(imgs, show=False, forceFloat=True):
+def get_wms(imgs, power_coef, show=False, forceFloat=True):
     """Return a list of weight maps for each image
 
     @params: imgs: [image (np.array)] a list of image with different exposure
@@ -48,7 +48,7 @@ def get_wms(imgs, show=False, forceFloat=True):
 
     wms = []
     for img in imgs:
-        wms.append(get_wm(img, show=show))
+        wms.append(get_wm(img, power_coef, show=show))
 
     if forceFloat:
         wms = [wm.astype(np.float32) for wm in wms]
@@ -104,16 +104,16 @@ def fuse_and_sum_images(imgs, normalized_wms, forceInt=False):
     return clipped_fused_image
 
 
-def naive_fusion(imgs, show=False):
+def naive_fusion(imgs, power_coef, show=False):
     """Naive fusion of images
     @params: imgs: [image (np.array)] a list of image with different exposure
     @params: show: bool, if True, show the weight map of the first image
     @return: image (np.array) the fused image"""
 
-    wms = get_wms(imgs, show=show)
+    wms = get_wms(imgs, power_coef, show=show)
 
     n_wms = normalize_wms(wms, verbose=show)
 
-    fused_image = fuse_images(imgs, n_wms)
+    fused_image = fuse_and_sum_images(imgs, n_wms)
 
     return fused_image
