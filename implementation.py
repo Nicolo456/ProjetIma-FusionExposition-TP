@@ -21,7 +21,7 @@ def make_fused_summed_pyr(imgs, show=False, floors=3):
         img, floors=floors, show=show) for img in imgs]
     sorted_imgs_pyrl = sort_pyr(imgs_pyrl)
 
-    wms_pyrg = [pyramid_down(wm) for wm in wms]
+    wms_pyrg = [pyramid_down(wm, floors=floors) for wm in wms]
     sorted_n_wms_pyr = get_sorted_n_wms_pyrs(wms_pyrg)
 
     fused_summed_pyr = get_fused_summed_pyr(
@@ -77,14 +77,19 @@ def get_fused_summed_pyr(sorted_n_wms_pyr, sorted_imgs_pyrl):
     return fused_summed_pyr
 
 
-def get_exposition_fused_image(imgs, show=False, clip=True):
+def get_exposition_fused_image(imgs, show=False, clip=True, floors=3):
     """Wrapper used to execute the paper algorithme
 
     @params: imgs: [image (np.array)] a list of image with different exposure
     @return: image (np.array) the final image"""
 
+    i = floors - 1
+    error_msg = f"La taille de l'image doit être divisible par 2^(floors-1) \n\t=> ici {
+        2**i} ne divise pas {imgs[0].shape[0:2]}"
+    assert imgs[0].shape[0] % 2**i == 0 and imgs[0].shape[1] % 2**i == 0, error_msg
+
     # Execute the wrapper for the pyramid
-    fused_summed_pyr = make_fused_summed_pyr(imgs, show=False)
+    fused_summed_pyr = make_fused_summed_pyr(imgs, show=False, floors=floors)
 
     fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
     final_image = reconstruct_from_lpyr(fused_summed_pyr_bgr)
@@ -105,5 +110,5 @@ if __name__ == "__main__":
     img_u = open_image("img/venise/UnderSat.jpg")
     imgs = [img_m, img_o, img_u]
 
-    final_image = get_exposition_fused_image(imgs, show=False)
+    final_image = get_exposition_fused_image(imgs, show=False, floors=5)
     show_image(final_image, img1_title='Final image')
