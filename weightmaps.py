@@ -114,6 +114,21 @@ def naive_fusion(imgs, power_coef, show=False):
 
     n_wms = normalize_wms(wms, verbose=show)
 
-    fused_image = fuse_and_sum_images(imgs, n_wms)
+    fused_image = fuse_and_sum_images(imgs, n_wms, forceInt=True)
 
     return fused_image
+
+
+if __name__ == "__main__":
+    # Open an image with numpy, show it with matplotlib
+    img_m = open_image("img/trans_dams/med_aligned.tiff")
+    img_o = open_image("img/trans_dams/over_aligned.tiff")
+    img_u = open_image("img/trans_dams/under_aligned.tiff")
+
+    img_m = open_image("img/venise/MeanSat.jpg")
+    img_o = open_image("img/venise/OverSat.jpg")
+    img_u = open_image("img/venise/UnderSat.jpg")
+    imgs = [img_m, img_o, img_u]
+
+    fused_image = naive_fusion(imgs, power_coef=[1, 1, 1], show=False)
+    show_image(fused_image)

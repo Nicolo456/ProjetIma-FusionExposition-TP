@@ -97,9 +97,9 @@ def get_exposition_fused_image(imgs, power_coef, show=False, clip=True, floors=3
     fused_summed_pyr = make_fused_summed_pyr(
         imgs, power_coef, show=False, floors=floors)
 
-    fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
-    final_image = reconstruct_from_lpyr(fused_summed_pyr_bgr)
-    final_image = BGR2RGB(final_image)
+    # fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
+    final_image = reconstruct_from_lpyr(fused_summed_pyr)
+    # final_image = BGR2RGB(final_image)
 
     if clip:
         final_image = np.clip(final_image, 0, 255).astype(np.uint8)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     imgs = [img_m, img_o, img_u]
 
     # [contrast_power, saturation_power, well_exposedness_power]
-    power_coef = [0, 1, 0]
+    power_coef = [0.5, 0.5, 0.5]
 
     final_image = get_exposition_fused_image(
         imgs, power_coef, show=False, floors=5)

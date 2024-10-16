@@ -71,7 +71,7 @@ def reconstruct_from_lpyr(pyr, show=False):
     return reconstructed
 
 
-def laplacian_pyramid(im, floors=3, show=False, rgb=True):
+def laplacian_pyramid(im, floors=3, show=False, rgb=False):
     """
     Compute the Laplacian pyramid of an image.
 
