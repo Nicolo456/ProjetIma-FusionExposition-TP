@@ -3,8 +3,9 @@ from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_l
 from fs_func import open_image, save_image
 from weightmaps import get_wms, normalize_wms, fuse_and_sum_images
 from pyramid import pyramid_down, reconstruct_from_lpyr, laplacian_pyramid
+from datetime import datetime
 
-# TODO: Mettre des s partout au pyr parce que y en a plusieurs
+# TODO: NORMALISER TOUT
 
 
 def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
@@ -18,7 +19,7 @@ def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
 
     wms = get_wms(imgs, power_coef, show=show, forceFloat=True)
 
-    imgs = [img.astype(np.float32) for img in imgs]
+    imgs = [(img/255).astype(np.float32) for img in imgs]
 
     imgs_pyrl = [laplacian_pyramid(
         img, floors=floors, show=show) for img in imgs]
@@ -101,6 +102,7 @@ def get_exposition_fused_image(imgs, power_coef, show=False, clip=True, floors=3
     final_image = reconstruct_from_lpyr(fused_summed_pyr)
     # final_image = BGR2RGB(final_image)
 
+    final_image = final_image * 255
     if clip:
         final_image = np.clip(final_image, 0, 255).astype(np.uint8)
     if show:
@@ -123,3 +125,8 @@ if __name__ == "__main__":
     final_image = get_exposition_fused_image(
         imgs, power_coef, show=False, floors=8)
     show_image(final_image, img1_title='Final image')
+
+    # Save the image into the logs folder
+    current_time = datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
+    save_image(
+        final_image, f"img/logs/reconstructed_image_{current_time}.tiff")
