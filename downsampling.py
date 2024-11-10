@@ -2,7 +2,13 @@ from PIL import Image
 import os
 
 
-def downsample_image(image_path, lambda_factor):
+def downsample_image(image_path, lambda_factor, two_divisibily_factor=0):
+    """Downsample an image by a given factor.
+    Args:
+        image_path (str): Chemin vers l'image à sous-échantillonner.
+        lambda_factor (int): Facteur de sous-échantillonnage.
+        two_divisibily_factor (int): Facteur de divisibilité par 2. Oblige l'image à être divisible par 2^two_divisibily_factor.
+    """
     # Ouvre l'image
     img = Image.open(image_path)
 
@@ -10,8 +16,10 @@ def downsample_image(image_path, lambda_factor):
     width, height = img.size
 
     # Calcule les nouvelles dimensions
-    new_width = int(width / lambda_factor)
-    new_height = int(height / lambda_factor)
+    new_width = (int(width / lambda_factor)//2 **
+                 two_divisibily_factor) * 2**two_divisibily_factor
+    new_height = (int(height / lambda_factor)//2 **
+                  two_divisibily_factor) * 2**two_divisibily_factor
 
     # Redimensionne (sous-échantillonne) l'image
     downsampled_img = img.resize(
@@ -32,6 +40,9 @@ def downsample_image(image_path, lambda_factor):
 # Exemple d'utilisation
 image_path = "img/perso_dams/DSC082"
 lst = ["img/perso_dams/DSC082"+str(i)+".tiff" for i in range(59, 66)]
-lambda_factor = 6  # Exemple : sous-échantillonner d'un facteur de 2
+lambda_factor = 6
+# Facteur obligant l'image à être divisible par 2**two_divisibily_factor
+two_divisibily_factor = 6
 for img in lst:
-    downsample_image(img, lambda_factor)
+    downsample_image(img, lambda_factor,
+                     two_divisibily_factor=two_divisibily_factor)

@@ -111,14 +111,15 @@ def get_exposition_fused_image(imgs, power_coef, show=False, clip=True, floors=3
 
 if __name__ == "__main__":
     # Open an image with numpy, show it with matplotlib
-    img_m = open_image("img/venise/MeanSat.jpg")
-    img_o = open_image("img/venise/OverSat.jpg")
-    img_u = open_image("img/venise/UnderSat.jpg")
-    imgs = [img_m, img_o, img_u]
+    img_m = open_image("img/trans_dams/med_aligned.tiff")
+    img_o = open_image("img/trans_dams/over_aligned.tiff")
+    img_u = open_image("img/trans_dams/under_aligned.tiff")
+    img_mo = open_image("img/trans_dams/med_over_aligned.tiff")
+    imgs = [img_m, img_o, img_u, img_mo]
 
     # [contrast_power, saturation_power, well_exposedness_power]
-    power_coef = [0.5, 0.5, 0.5]
+    power_coef = [0, 0, 0]
 
     final_image = get_exposition_fused_image(
-        imgs, power_coef, show=False, floors=5)
+        imgs, power_coef, show=False, floors=8)
     show_image(final_image, img1_title='Final image')
