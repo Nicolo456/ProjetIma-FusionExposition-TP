@@ -40,9 +40,10 @@ def downsample_image(image_path, lambda_factor, two_divisibily_factor=0):
 # Exemple d'utilisation
 image_path = "img/perso_dams/DSC082"
 lst = ["img/perso_dams/DSC082"+str(i)+".tiff" for i in range(59, 66)]
-lambda_factor = 6
+# Facteur de sous-échantillonnage
+lambda_factor = 2
 # Facteur obligant l'image à être divisible par 2**two_divisibily_factor
-two_divisibily_factor = 6
+two_divisibily_factor = 10
 for img in lst:
     downsample_image(img, lambda_factor,
                      two_divisibily_factor=two_divisibily_factor)

@@ -1,13 +1,13 @@
 import numpy as np
-from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
+from display_func import show_image, inspect_list_structure
 from fs_func import open_image, save_image
 from weightmaps import get_wms, normalize_wms, fuse_and_sum_images
 from pyramid import pyramid_down, reconstruct_from_lpyr, laplacian_pyramid
 from datetime import datetime
+from normalization import normalise_vector_decorator
+from assert_decorator import assert_normalized_images, assert_normalized_pyr, assert_normalized_pyrs, assert_image_size_divisible
 
-# TODO: NORMALISER TOUT
-
-
+@assert_normalized_images()
 def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
     """Wrapper used to generate the final pyramid like the paper
 
@@ -17,19 +17,17 @@ def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
     @params: show: bool, if True, show the weight map of the first image
     @return: [[image (np.array)]] a pyramid of the final image"""
 
-    wms = get_wms(imgs, power_coef, show=show, forceFloat=True)
-
-    imgs = [(img/255).astype(np.float32) for img in imgs]
+    wms = get_wms(imgs, power_coef, show=show)
 
     imgs_pyrl = [laplacian_pyramid(
         img, floors=floors, show=show) for img in imgs]
-    sorted_imgs_pyrl = sort_pyr(imgs_pyrl)
+    sorted_imgs_pyrsl = sort_pyr(imgs_pyrl)
 
     wms_pyrg = [pyramid_down(wm, floors=floors) for wm in wms]
-    sorted_n_wms_pyr = get_sorted_n_wms_pyrs(wms_pyrg)
+    sorted_n_wms_pyrs = get_sorted_n_wms_pyrs(wms_pyrg)
 
     fused_summed_pyr = get_fused_summed_pyr(
-        sorted_n_wms_pyr, sorted_imgs_pyrl)
+        sorted_n_wms_pyrs, sorted_imgs_pyrsl)
 
     if show:
         for i in range(len(fused_summed_pyr)):
@@ -37,7 +35,7 @@ def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
 
     return fused_summed_pyr
 
-
+@assert_normalized_pyrs(negative=True)
 def sort_pyr(pyrs):
     """Sort pyramid by floor
     An utilitarie function used to make transformation by floor easier"""
@@ -50,7 +48,7 @@ def sort_pyr(pyrs):
             sorted_pyr[i].append(img)
     return sorted_pyr
 
-
+@assert_normalized_pyrs(negative=True)
 def get_sorted_n_wms_pyrs(wms_pyrs):
     """Return a list of lists representing the floor. Each floor group contain the floor of each weight_map pyramid (sorted_n_wms_pyrs)
 
@@ -60,7 +58,7 @@ def get_sorted_n_wms_pyrs(wms_pyrs):
     sorted_n_wms_pyrs = list(map(normalize_wms, sorted_wms_pyrs))
     return sorted_n_wms_pyrs
 
-
+@assert_normalized_pyrs(nb_pyrs=2, negative=True)
 def get_fused_summed_pyr(sorted_n_wms_pyr, sorted_imgs_pyrl):
     """Return a list of all lists representing the floor. Each floor_group contain the floor of each fusion of weight_map and image pyramid
 
@@ -76,12 +74,12 @@ def get_fused_summed_pyr(sorted_n_wms_pyr, sorted_imgs_pyrl):
         # On applique fuse image sur chaque pyramide
         fused_summed_pyr.append(fuse_and_sum_images(sorted_imgs_pyrl[i_floor],
                                                     sorted_n_wms_pyr[i_floor]))
-
-    # fused_summed_pyr = list(map(fuse_and_sum_images, sorted_imgs_pyrl, sorted_n_wms_pyr))  # On applique fuse image sur chaque pyramide => optimised version
     return fused_summed_pyr
 
-
-def get_exposition_fused_image(imgs, power_coef, show=False, clip=True, floors=3):
+@assert_image_size_divisible
+@normalise_vector_decorator(force_normalize_return=True)
+@assert_normalized_images()
+def get_exposition_fused_image(imgs, floors, power_coef, show=False, clip=True):
     """Wrapper used to execute the paper algorithme
 
     @params: imgs: [image (np.array)] a list of image with different exposure
@@ -89,24 +87,13 @@ def get_exposition_fused_image(imgs, power_coef, show=False, clip=True, floors=3
         [contrast_power, saturation_power, well_exposedness_power]
     @return: image (np.array) the final image"""
 
-    i = floors - 1
-    error_msg = f"La taille de l'image doit être divisible par 2^(floors-1) \n\t=> ici {
-        2**i} ne divise pas {imgs[0].shape[0:2]}"
-    assert imgs[0].shape[0] % 2**i == 0 and imgs[0].shape[1] % 2**i == 0, error_msg
-
     # Execute the wrapper for the pyramid
     fused_summed_pyr = make_fused_summed_pyr(
         imgs, power_coef, show=False, floors=floors)
 
-    # fused_summed_pyr_bgr = [RGB2BGR(img) for img in fused_summed_pyr]
     final_image = reconstruct_from_lpyr(fused_summed_pyr)
-    # final_image = BGR2RGB(final_image)
 
-    final_image = final_image * 255
-    if clip:
-        final_image = np.clip(final_image, 0, 255).astype(np.uint8)
     if show:
-        print("DEBGUG:")
         show_image(final_image, img1_title='Final image')
     return final_image
 
@@ -120,10 +107,11 @@ if __name__ == "__main__":
     imgs = [img_m, img_o, img_u, img_mo]
 
     # [contrast_power, saturation_power, well_exposedness_power]
-    power_coef = [0, 0, 0]
+    # When the power augments, it will more effect the weight map, if the coefficient is 0, it will not effect the weight map.
+    power_coef = [10, 1, 1]
 
     final_image = get_exposition_fused_image(
-        imgs, power_coef, show=False, floors=8)
+        imgs, 11, power_coef, show=False)
     show_image(final_image, img1_title='Final image')
 
     # Save the image into the logs folder

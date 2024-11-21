@@ -1,7 +1,8 @@
 import cv2
 import matplotlib.pyplot as plt
 from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
-
+from normalization import normalise_laplacian_pyr
+from assert_decorator import assert_normalized_pyr
 
 def pyramid_down(im, floors=3, show=False):
     """
@@ -15,7 +16,6 @@ def pyramid_down(im, floors=3, show=False):
         Returns:
             list: Pyramid levels, with each level being a downsampled version of the previous one.
     """
-
     pyr = [im]
     if show == True:
         show_image_cv2(im)
@@ -50,7 +50,7 @@ def pyramid_up(im_down, floors=3, show=False):
             show_image_cv2(higher)
     return pyr
 
-
+@assert_normalized_pyr(negative=True)
 def reconstruct_from_lpyr(pyr, show=False):
     """
         Reconstruct an image from a Laplacian pyramid. (First level is the highest resolution)
@@ -70,8 +70,7 @@ def reconstruct_from_lpyr(pyr, show=False):
             show_image_cv2(reconstructed)
     return reconstructed
 
-
-def laplacian_pyramid(im, floors=3, show=False, rgb=False):
+def laplacian_pyramid(im, floors=3, show=False):
     """
     Compute the Laplacian pyramid of an image.
 
@@ -79,7 +78,6 @@ def laplacian_pyramid(im, floors=3, show=False, rgb=False):
         im (numpy.ndarray): Input image.
         floors (int): Number of pyramid levels. Default is 3.
         show (bool): If True, display intermediate results. Default is False.
-        rgb (bool): If True, convert output to RGB. Default is True.
 
     Returns:
         list: Laplacian pyramid levels.
@@ -96,11 +94,6 @@ def laplacian_pyramid(im, floors=3, show=False, rgb=False):
         if show:
             show_image_cv2(lapl_im)
     pyr.append(last_floor)
-    if rgb:
-        for i in range(floors):
-            pyr[i] = BGR2RGB(pyr[i])
-            pyr_down[i] = BGR2RGB(pyr[i])
-            pyr_up[i] = BGR2RGB(pyr[i])
     return pyr
 
 
