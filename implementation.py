@@ -1,11 +1,11 @@
 import numpy as np
-from display_func import show_image, inspect_list_structure
+from display_func import show_difference, show_image, inspect_list_structure
 from fs_func import open_image, save_image
 from weightmaps import get_wms, normalize_wms, fuse_and_sum_images
 from pyramid import pyramid_down, reconstruct_from_lpyr, laplacian_pyramid
 from datetime import datetime
 from normalization import normalise_vector_decorator
-from assert_decorator import assert_normalized_images, assert_normalized_pyr, assert_normalized_pyrs, assert_image_size_divisible
+from assert_decorator import assert_normalized_images, assert_normalized_pyrs, assert_image_size_divisible
 
 @assert_normalized_images()
 def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
@@ -65,7 +65,6 @@ def get_fused_summed_pyr(sorted_n_wms_pyr, sorted_imgs_pyrl):
     @params: sorted_n_wms_pyrs: [[image (np.array)]] a list of floor_group with normalised weight map of the floor (one by pyramid)
     @params: sorted_imgs_pyrl: [[image (np.array)]] a list of floor_group with image pyramid of the floor (one by pyramid)
     @return: [[image (np.array)]] a list of floor_group with fused image of the floor (one by pyramid)"""
-
     fused_summed_pyr = []
 
     assert len(sorted_n_wms_pyr) == len(
@@ -93,9 +92,42 @@ def get_exposition_fused_image(imgs, floors, power_coef, show=False, clip=True):
 
     final_image = reconstruct_from_lpyr(fused_summed_pyr)
 
+    # Execute the wrapper for the pyramid
+    fused_summed_pyr = make_fused_summed_pyr(
+        imgs, power_coef, show=False, floors=floors)
+
+    final_image = reconstruct_from_lpyr(fused_summed_pyr)
+
     if show:
         show_image(final_image, img1_title='Final image')
     return final_image
+
+@assert_image_size_divisible
+@normalise_vector_decorator(force_normalize_return=True)
+@assert_normalized_images()
+def get_exposition_fused_image_sep_channel(imgs, floors, power_coef, show=False, clip=True):
+    """Wrapper used to execute the paper algorithme
+
+    @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: power_coef: [float] a list of power coefficient for each weight map
+        [contrast_power, saturation_power, well_exposedness_power]
+    @return: image (np.array) the final image"""
+
+    # Try to execute on each channel
+    imgs_channels = [[img[:,:,i] for img in imgs] for i in range(3)]
+
+    final_image_channels = []
+    for imgs_channel in imgs_channels:
+        fused_summed_pyr_channel = make_fused_summed_pyr(imgs_channel, power_coef, show=False, floors=floors)
+        final_image_channel = reconstruct_from_lpyr(fused_summed_pyr_channel)
+
+        final_image_channels.append(final_image_channel)
+    
+    final_image_sep_channel = np.stack(final_image_channels, axis=-1)
+
+    if show:
+        show_image(final_image_sep_channel, img1_title='Final image sep channel')
+    return final_image_sep_channel
 
 
 if __name__ == "__main__":
@@ -106,15 +138,24 @@ if __name__ == "__main__":
     img_mo = open_image("img/trans_dams/med_over_aligned.tiff")
     imgs = [img_m, img_o, img_u, img_mo]
 
+    img_m = open_image("img/venise/MeanSat.jpg")
+    img_o = open_image("img/venise/OverSat.jpg")
+    img_u = open_image("img/venise/UnderSat.jpg")
+    imgs = [img_m, img_o, img_u]
+
     # [contrast_power, saturation_power, well_exposedness_power]
     # When the power augments, it will more effect the weight map, if the coefficient is 0, it will not effect the weight map.
     power_coef = [10, 1, 1]
 
     final_image = get_exposition_fused_image(
-        imgs, 11, power_coef, show=False)
+        imgs, 4, power_coef, show=False)
     show_image(final_image, img1_title='Final image')
 
     # Save the image into the logs folder
     current_time = datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
     save_image(
         final_image, f"img/logs/reconstructed_image_{current_time}.tiff")
+
+    # TODO: For dealing with color images, we have found that carrying out the blending each color channel separately produces good results
+    # TODO: 
+    # Each channel processed separately for the well_exposedness

@@ -73,3 +73,9 @@ def assert_image_size_divisible(func):
 
         return func(imgs, floors, *args, **kwargs)
     return wrapper
+
+def is_img_greyscale(img):
+    """Check if an image is greyscale or not
+    @param: img: [np.array] an image
+    @return: [bool] True if the image is greyscale, False otherwise"""
+    return not (len(img.shape) > 2 and img.shape[2] == 3)

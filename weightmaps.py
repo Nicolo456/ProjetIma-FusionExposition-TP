@@ -1,8 +1,8 @@
 import numpy as np
 from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
 from fs_func import open_image, save_image
-from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter
-from assert_decorator import assert_normalized_images, assert_normalized_image
+from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
+from assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
 
 def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
     """Return a weight map for an image
@@ -25,15 +25,24 @@ def get_wm(img, power_coef, show=False):
     @params: img: image (np.array)
     @return: weight map (np.array)"""
 
-    img_grayscale = apply_grayscale(img)
+    if is_img_greyscale(img):
+        # L'image est en noir et blanc
+        contrast_wm = apply_contrast_filter(img, show=show)
+        saturation_wm = np.ones_like(img)
+        well_exposedness_wm = apply_well_exposedness_filter_grayscale(img)
+        wm = calc_wm(
+            contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
+    else:
+        # L'image est en couleur
+        img_grayscale = apply_grayscale(img)
 
-    # Compute the weight map, for each filter we want to normalize it between 0 and 1
-    contrast_wm = apply_contrast_filter(img_grayscale, show=show)
-    saturation_wm = apply_saturation_filter(img, show=show)
-    well_exposedness_wm = apply_well_exposedness_filter(
-        img, show=show)
-    wm = calc_wm(
-        contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
+        # Compute the weight map, for each filter we want to normalize it between 0 and 1
+        contrast_wm = apply_contrast_filter(img_grayscale, show=show)
+        saturation_wm = apply_saturation_filter(img, show=show)
+        well_exposedness_wm = apply_well_exposedness_filter(
+            img, show=show)
+        wm = calc_wm(
+            contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
     return wm
 
 @assert_normalized_images()
@@ -81,17 +90,22 @@ def fuse_and_sum_images(imgs, normalized_wms):
     @params: imgs: [image (np.array)] a list of image with different exposure
     @params: normalized_wms: [image (np.array)] a list of normalized weight map
     @return: image (np.array) the fused image"""
+    
+    if is_img_greyscale(imgs[0]):
+        fused_image = np.sum(
+            [normalized_wm * img for normalized_wm, img in zip(normalized_wms, imgs)], axis=0)
+    
+    else:
+        # Copy the weight on every channel
+        normalized_wms_3d = [np.stack(
+            [normalized_wm] * 3, axis=-1) for normalized_wm in normalized_wms]
 
-    # Copy the weight on every channel
-    normalized_wms_3d = [np.stack(
-        [normalized_wm] * 3, axis=-1) for normalized_wm in normalized_wms]
+        # Fusionner les images en utilisant les poids normalisés
+        # print("zip",list(zip(normalized_wms_3d, imgs)))
+        # tableau de (a,b) où a est une wm et b une liste d'images pour notre pb
 
-    # Fusionner les images en utilisant les poids normalisés
-    # print("zip",list(zip(normalized_wms_3d, imgs)))
-    # tableau de (a,b) où a est une wm et b une liste d'images pour notre pb
-
-    fused_image = np.sum(
-        [normalized_wm_3d * img for normalized_wm_3d, img in zip(normalized_wms_3d, imgs)], axis=0)
+        fused_image = np.sum(
+            [normalized_wm_3d * img for normalized_wm_3d, img in zip(normalized_wms_3d, imgs)], axis=0)
 
     return fused_image
 

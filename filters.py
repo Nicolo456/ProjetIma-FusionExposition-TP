@@ -66,7 +66,7 @@ def apply_well_exposedness_filter_grayscale(img_channel, sigma=0.2):
 def apply_well_exposedness_filter(img_colored, show=False, sigma=0.2):
     '''Looking at just the raw intensities within a channel, reveals how well a pixel is exposed.
     We want to keep intensities that are not near zero (underexposed) or one (overexposed). We weight each intensity i based on how close it is to 0.5 using a Gauss curve: exp(i−0.5)ˆ2/2σˆi , where σ equals 0.2 in our implementation. To account for multiple color channels, we apply the Gauss curve to each channel separately, and multiply the results, yielding the measure E'''
-
+    
     # Extract the R, G, B channels
     R = img_colored[:, :, 0]
     G = img_colored[:, :, 1]
