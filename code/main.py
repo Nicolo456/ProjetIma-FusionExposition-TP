@@ -24,17 +24,36 @@ if __name__ == "__main__":
     img_mo = open_image("img/trans_dams/med_over_aligned.tiff")
     imgs = [img_m, img_o, img_u, img_mo]
 
-    nb_floors = 7
-    img_m = upsample_image("img/venise/MeanSat.jpg", two_divisibily_factor=6)
-    img_o = upsample_image("img/venise/OverSat.jpg", two_divisibily_factor=6)
-    img_u = upsample_image("img/venise/UnderSat.jpg", two_divisibily_factor=6)
-    imgs = [img_m, img_o, img_u]
+    # nb_floors = 7
+    # img_m = upsample_image("img/venise/MeanSat.jpg",
+    #                        two_divisibily_factor=nb_floors)
+    # img_o = upsample_image("img/venise/OverSat.jpg",
+    #                        two_divisibily_factor=nb_floors)
+    # img_u = upsample_image("img/venise/UnderSat.jpg",
+    #                        two_divisibily_factor=nb_floors)
+    # imgs = [img_m, img_o, img_u]
+
+    # PATH_DIR = "img/foyer/"
+    # imgs_path = listdir(PATH_DIR)
+
+    # imgs = [upsample_image(f"{PATH_DIR}{img_i_path}",
+    #                        two_divisibily_factor=8) for img_i_path in imgs_path if img_i_path != ".DS_Store"]
+    # img_m = imgs[3]
+
+    # img_u = open_image("img/foyer/1under.tiff")
+    # img_mu = open_image("img/foyer/2medunder.tiff")
+    # img_m = open_image("img/foyer/3med.tiff")
+    # img_mo = open_image("img/foyer/4medover.tiff")
+    # img_o = open_image("img/foyer/5over.tiff")
+    # img_oo = open_image("img/foyer/6overover.tiff")
+
+    # imgs = [img_u, img_mu, img_m, img_mo, img_o, img_oo]
 
     # ==================================== Fusion or fetch last image ============================
     if not args.reuse:
         # [contrast_power, saturation_power, well_exposedness_power]
         # When the power augments, it will more effect the weight map, if the coefficient is 0, it will not effect the weight map.
-        power_coef = [100, 120, 100]
+        power_coef = [1, 1, 5]
 
         final_image = get_exposition_fused_image(
             imgs, "Max", power_coef, show=False)

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def assert_normalized_image(nb_image=1, negative=False):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -97,10 +98,10 @@ def assert_image_size_divisible(func):
 def get_max_floor_if_floor_Max(func):
     def wrapper(imgs, floors, *args, **kwargs):
         if floors == "Max":
-            n_floors = 1
-            while imgs[0].shape[0] % 2**(n_floors) == 0 or imgs[0].shape[1] % 2**(n_floors) == 0:
-                n_floors += 1
-            n_floors -= 1
+            i = 0
+            while imgs[0].shape[0] % 2**i == 0 and imgs[0].shape[1] % 2**i == 0:
+                i += 1
+            n_floors = i - 1
             print(f"Le nombre de niveaux de la pyramide est : {n_floors}")
         return func(imgs, n_floors, *args, **kwargs)
     return wrapper

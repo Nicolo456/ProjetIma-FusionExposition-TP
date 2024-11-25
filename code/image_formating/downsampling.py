@@ -65,6 +65,7 @@ def upsample_image(image_path, two_divisibily_factor=0):
 
 
 if __name__ == "__main__":
+
     # Exemple d'utilisation
     image_path = "img/perso_dams/DSC082"
     lst = ["img/perso_dams/DSC082"+str(i)+".tiff" for i in range(59, 66)]
