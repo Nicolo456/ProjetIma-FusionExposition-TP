@@ -3,7 +3,6 @@ from image_formating.colorimetric_transform import correct_hist_hsv, correct_his
 from datetime import datetime
 from fusion_exposition.implementation import get_exposition_fused_image
 from fusion_exposition.display_func import show_image
-from image_formating.colorimetric_transform import correct_hist_hsv, correct_hist_rgb, apply_clahe_hsv
 from image_formating.image_transform import unsharp_mask
 from func.arg_parser import init_arg_parser
 from func.date_handler import get_latest_file
@@ -16,6 +15,7 @@ DATE_FORMAT = "%Y-%m-%d:%H-%M-%S"
 if __name__ == "__main__":
     args = init_arg_parser()
 
+    # ==================================== Open images ==========================================
     # Open an image with numpy, show it with matplotlib
     img_m = open_image("img/trans_dams/med_aligned.tiff")
     img_o = open_image("img/trans_dams/over_aligned.tiff")
@@ -28,6 +28,7 @@ if __name__ == "__main__":
     # img_u = open_image("img/venise/UnderSat.jpg")
     # imgs = [img_m, img_o, img_u]
 
+    # ==================================== Fusion or fetch last image ============================
     if not args.reuse:
         # [contrast_power, saturation_power, well_exposedness_power]
         # When the power augments, it will more effect the weight map, if the coefficient is 0, it will not effect the weight map.
@@ -45,6 +46,7 @@ if __name__ == "__main__":
         final_image_name= get_latest_file(listdir(LOGS_FOLDER), DATE_FORMAT)
         final_image = open_image(f"{LOGS_FOLDER}{final_image_name}")
 
+    # ==================================== Show Result ========================================
     show_image(final_image, img1_title='Final image')
     previous_final_image = final_image
     final_image = unsharp_mask(
@@ -52,7 +54,9 @@ if __name__ == "__main__":
     show_image(final_image, img1_title='Final image sharp',
                     img2=previous_final_image, img2_title='Final image')
     
+    # ==================================== If flag apply transform ============================
     if args.exposition:
+        # ====================== Histogram equalization =====================
         corrected_hist_final_image = correct_hist_rgb(imgs, final_image)
         show_image(corrected_hist_final_image,
                     img1_title='Corrected hist Final image')
@@ -64,10 +68,11 @@ if __name__ == "__main__":
         corrected_hist_final_image = correct_hist_hsv(imgs, final_image)
         show_image(corrected_hist_final_image,
                     img1_title='Corrected hist hsv Final image')
-
+        
         corrected_hist_final_image = correct_hist_hsv([img_m], final_image)
         show_image(corrected_hist_final_image,
                     img1_title='Corrected hist for med hsv Final image')
 
+        # ============================== CLAHE ==============================
         clahe_final_image = apply_clahe_hsv(final_image)
         show_image(clahe_final_image, img1_title='CLAHE Final image')

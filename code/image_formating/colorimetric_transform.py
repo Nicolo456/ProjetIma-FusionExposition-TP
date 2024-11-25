@@ -51,7 +51,7 @@ def correct_hist_grayscale(imgs, final_image):
 def correct_hist_rgb(imgs, final_image):
     """ATTENTION: travail avec des ints entre 0 et 255
     travail avec des images rgb"""
-    # Calculate histograms for all 4 images
+    # Calculate histograms for all images
     matched_image = np.zeros_like(final_image)
     for i in range(3):
         imgs_1channel = [img[:, :, i] for img in imgs]
