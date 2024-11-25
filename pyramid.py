@@ -4,6 +4,7 @@ from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_l
 from normalization import normalise_laplacian_pyr
 from assert_decorator import assert_normalized_pyr
 
+
 def pyramid_down(im, floors=3, show=False):
     """
         Construct an image pyramid by downsampling.
@@ -50,6 +51,7 @@ def pyramid_up(im_down, floors=3, show=False):
             show_image_cv2(higher)
     return pyr
 
+
 @assert_normalized_pyr(negative=True)
 def reconstruct_from_lpyr(pyr, show=False):
     """
@@ -69,6 +71,7 @@ def reconstruct_from_lpyr(pyr, show=False):
         if show:
             show_image_cv2(reconstructed)
     return reconstructed
+
 
 def laplacian_pyramid(im, floors=3, show=False):
     """

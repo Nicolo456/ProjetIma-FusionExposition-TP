@@ -4,6 +4,7 @@ from fs_func import open_image, save_image
 from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
 from assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
 
+
 def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
     """Return a weight map for an image
     @params: img: image (np.array)
@@ -18,6 +19,7 @@ def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, s
     elif show == True and img is None:
         show_image(wm, img1_title='Final Weight Map', is_im1_grey=True)
     return wm
+
 
 @assert_normalized_image()
 def get_wm(img, power_coef, show=False):
@@ -45,6 +47,7 @@ def get_wm(img, power_coef, show=False):
             contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
     return wm
 
+
 @assert_normalized_images()
 def get_wms(imgs, power_coef, show=False):
     """Return a list of weight maps for each image
@@ -58,6 +61,7 @@ def get_wms(imgs, power_coef, show=False):
     for img in imgs:
         wms.append(get_wm(img, power_coef, show=show))
     return wms
+
 
 @assert_normalized_images()
 def normalize_wms(wms, verbose=False):
@@ -84,17 +88,18 @@ def normalize_wms(wms, verbose=False):
 
     return normalized_wms
 
+
 @assert_normalized_images(2, negative=True)
 def fuse_and_sum_images(imgs, normalized_wms):
     """Fusionner et sommed les images en utilisant les poids normalisés
     @params: imgs: [image (np.array)] a list of image with different exposure
     @params: normalized_wms: [image (np.array)] a list of normalized weight map
     @return: image (np.array) the fused image"""
-    
+
     if is_img_greyscale(imgs[0]):
         fused_image = np.sum(
             [normalized_wm * img for normalized_wm, img in zip(normalized_wms, imgs)], axis=0)
-    
+
     else:
         # Copy the weight on every channel
         normalized_wms_3d = [np.stack(
@@ -108,6 +113,7 @@ def fuse_and_sum_images(imgs, normalized_wms):
             [normalized_wm_3d * img for normalized_wm_3d, img in zip(normalized_wms_3d, imgs)], axis=0)
 
     return fused_image
+
 
 @assert_normalized_images()
 def naive_fusion(imgs, power_coef, show=False):

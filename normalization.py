@@ -54,6 +54,7 @@ def normalise_laplacian_pyr(func):
                 n_img_floor = np.zeros_like(img_floor)
             else:
                 n_img_floor = (img_floor - np.min(img_floor)) / (np.max(img_floor) - np.min(img_floor))
+                
                 n_res_pyr.append(n_img_floor)
         return n_res_pyr
     return wrapper

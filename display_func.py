@@ -84,7 +84,8 @@ def inspect_list_structure(lst, name=None, level=0, isExit=False):
         print(f"{indent}{type(lst).__name__}: {lst}")
 
     if level == 0 and isExit:
-        exit(0)     
+        exit(0)
+
 
 def show_difference(img1, img2, title="Difference"):
     img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
