@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import ndimage
-from display_func import show_image
-from assert_decorator import assert_normalized_image
+from .display_func import show_image
+from .assert_decorator import assert_normalized_image
 
 
 @assert_normalized_image(negative=True)

@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-import inspect
 
 
 def show_image(img1, img1_title='Original Image', is_im1_grey=False, img2=None, img2_title='Filtered Image', is_im2_grey=False):

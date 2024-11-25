@@ -1,8 +1,8 @@
 import cv2
 import matplotlib.pyplot as plt
-from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
-from normalization import normalise_laplacian_pyr
-from assert_decorator import assert_normalized_pyr
+from .display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
+from .normalization import normalise_laplacian_pyr
+from .assert_decorator import assert_normalized_pyr
 
 
 def pyramid_down(im, floors=3, show=False):

@@ -1,13 +1,10 @@
 import numpy as np
 import cv2
-from display_func import show_image
-from assert_decorator import is_img_greyscale
-
 
 def compute_hist(img):
     """ATTENTION: travail avec des ints entre 0 et 255"""
     # Convert the image to grayscale (if it's not already)
-    if not is_img_greyscale:
+    if (len(img.shape) > 2 and img.shape[2] == 3):
         gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     else:
         gray_image = img

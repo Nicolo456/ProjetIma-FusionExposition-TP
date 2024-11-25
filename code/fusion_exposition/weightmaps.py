@@ -1,8 +1,8 @@
 import numpy as np
-from display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
-from fs_func import open_image, save_image
-from filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
-from assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
+from .display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
+from .fs_func import open_image, save_image
+from .filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
+from .assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
 
 
 def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
