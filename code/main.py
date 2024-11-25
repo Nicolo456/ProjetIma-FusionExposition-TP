@@ -33,7 +33,7 @@ if __name__ == "__main__":
     #                        two_divisibily_factor=nb_floors)
     # imgs = [img_m, img_o, img_u]
 
-    PATH_DIR = "img/foyer/"
+    PATH_DIR = "imgs/foyer/"
     imgs_path = listdir(PATH_DIR)
 
     imgs = [upsample_image(f"{PATH_DIR}{img_i_path}",
