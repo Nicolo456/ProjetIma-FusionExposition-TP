@@ -50,29 +50,30 @@ def stack_images(images):
     return base_image
 
 
-# Chargement des images
-# Remplacer par vos chemins d'images
-path_input = 'img/perso_dams/'
-path_output = 'img/trans_dams/'
-ext = '.tiff'
-img_names = {'med': "DSC08261_downsampled",
-             "over": "DSC08265_downsampled",
-             "under": "DSC08262_downsampled",
-             "med_over": "DSC08263_downsampled"}
-images = [cv2.imread(path_input+img_names[img_key]+ext)
-          for img_key in img_names]
+if __name__ == "__main__":
+    # Chargement des images
+    # Remplacer par vos chemins d'images
+    path_input = 'img/perso_dams/'
+    path_output = 'img/trans_dams/'
+    ext = '.tiff'
+    img_names = {'med': "DSC08261_downsampled",
+                 "over": "DSC08265_downsampled",
+                 "under": "DSC08262_downsampled",
+                 "med_over": "DSC08263_downsampled"}
+    images = [cv2.imread(path_input+img_names[img_key]+ext)
+              for img_key in img_names]
 
-base_image = images[0]
-aligned_imgs = [base_image]
+    base_image = images[0]
+    aligned_imgs = [base_image]
 
-for img in images[1:]:
-    aligned_imgs.append(align_images(base_image, img))
+    for img in images[1:]:
+        aligned_imgs.append(align_images(base_image, img))
 
-for i, img_key in enumerate(img_names):
-    # Sauvegarder ou afficher le résultat
-    cv2.imwrite(path_output+img_key+"_aligned"+ext, aligned_imgs[i])
+    for i, img_key in enumerate(img_names):
+        # Sauvegarder ou afficher le résultat
+        cv2.imwrite(path_output+img_key+"_aligned"+ext, aligned_imgs[i])
 
-for i, img_key in enumerate(img_names):
-    cv2.imshow('Aligned and Stacked Image', aligned_imgs[i])
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    for i, img_key in enumerate(img_names):
+        cv2.imshow('Aligned and Stacked Image', aligned_imgs[i])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
