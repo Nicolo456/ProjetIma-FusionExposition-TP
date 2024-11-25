@@ -9,7 +9,7 @@ from func.date_handler import get_latest_file
 from os import listdir
 from image_formating.downsampling import upsample_image
 
-LOGS_FOLDER = "img/logs/"
+LOGS_FOLDER = "hidden_imgs/logs/"
 LOGS_SAVE_NAME = "final_image"
 DATE_FORMAT = "%Y-%m-%d:%H-%M-%S"
 
@@ -18,11 +18,11 @@ if __name__ == "__main__":
 
     # ==================================== Open images ==========================================
     # Open an image with numpy, show it with matplotlib
-    img_m = open_image("img/trans_dams/med_aligned.tiff")
-    img_o = open_image("img/trans_dams/over_aligned.tiff")
-    img_u = open_image("img/trans_dams/under_aligned.tiff")
-    img_mo = open_image("img/trans_dams/med_over_aligned.tiff")
-    imgs = [img_m, img_o, img_u, img_mo]
+    # img_m = open_image("img/trans_dams/med_aligned.tiff")
+    # img_o = open_image("img/trans_dams/over_aligned.tiff")
+    # img_u = open_image("img/trans_dams/under_aligned.tiff")
+    # img_mo = open_image("img/trans_dams/med_over_aligned.tiff")
+    # imgs = [img_m, img_o, img_u, img_mo]
 
     # nb_floors = 7
     # img_m = upsample_image("img/venise/MeanSat.jpg",
@@ -33,21 +33,12 @@ if __name__ == "__main__":
     #                        two_divisibily_factor=nb_floors)
     # imgs = [img_m, img_o, img_u]
 
-    # PATH_DIR = "img/foyer/"
-    # imgs_path = listdir(PATH_DIR)
+    PATH_DIR = "img/foyer/"
+    imgs_path = listdir(PATH_DIR)
 
-    # imgs = [upsample_image(f"{PATH_DIR}{img_i_path}",
-    #                        two_divisibily_factor=8) for img_i_path in imgs_path if img_i_path != ".DS_Store"]
-    # img_m = imgs[3]
-
-    # img_u = open_image("img/foyer/1under.tiff")
-    # img_mu = open_image("img/foyer/2medunder.tiff")
-    # img_m = open_image("img/foyer/3med.tiff")
-    # img_mo = open_image("img/foyer/4medover.tiff")
-    # img_o = open_image("img/foyer/5over.tiff")
-    # img_oo = open_image("img/foyer/6overover.tiff")
-
-    # imgs = [img_u, img_mu, img_m, img_mo, img_o, img_oo]
+    imgs = [upsample_image(f"{PATH_DIR}{img_i_path}",
+                           two_divisibily_factor=8) for img_i_path in imgs_path if img_i_path != ".DS_Store"]
+    img_m = imgs[3]
 
     # ==================================== Fusion or fetch last image ============================
     if not args.reuse:
