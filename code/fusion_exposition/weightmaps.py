@@ -122,23 +122,13 @@ def get_masks(imgs, show=False):
     px_sum_saturation_wm = np.sum(saturation_wms, axis=0)
     px_sum_well_exposedness_wm = np.sum(well_exposedness_wms, axis=0)
 
-    epsilon = 2e-2
+    epsilon = 5e-2
     contrast_mask = np.where(
         px_sum_contrast_wm < epsilon, 0, 1).astype(np.uint8)
     saturation_mask = np.where(
         px_sum_saturation_wm < epsilon, 0, 1).astype(np.uint8)
     well_exposedness_mask = np.where(
         px_sum_well_exposedness_wm < epsilon, 0, 1).astype(np.uint8)
-
-    # inspect_list_structure(contrast_mask, "contrast_mask")
-    # print(f"contrast_mask: {contrast_mask}")
-    # print(f"min of contrast_mask: {np.min(contrast_mask)}")
-    # inspect_list_structure(saturation_mask, "saturation_mask")
-    # print(f"saturation_mask: {saturation_mask}")
-    # print(f"min of saturation_mask: {np.min(saturation_mask)}")
-    # inspect_list_structure(well_exposedness_mask, "well_exposedness_mask")
-    # print(f"well_exposedness_mask: {well_exposedness_mask}")
-    # print(f"min of well_exposedness_mask: {np.min(well_exposedness_mask)}")
 
     return contrast_mask, saturation_mask, well_exposedness_mask
 
@@ -150,11 +140,17 @@ def normalize_wms(wms, verbose=False):
     @params: verbose: bool, if True, print the sum of the weight map
     @return: [image(np.array)] a list of normalized weight map"""
 
-    # Epsilon is a small value to avoid division by zero
-    epsilon = 1e-10 * np.ones_like(wms[0])
-
     px_sum_wms = np.sum(wms, axis=0)
-    print("pixel under 1e-10:", px_sum_wms[px_sum_wms < 1e-10])
+
+    epsilon = 1e-20
+    pixel_2_low = px_sum_wms[px_sum_wms < epsilon]
+
+    if len(pixel_2_low) > 0:
+        # For deactivate automatic formatting
+        print(f"""[WARNING] Sum of weight maps to low (under {epsilon}). {len(pixel_2_low)}/{wms[0].shape[0]*wms[0].shape[1]} pixel(s) counted ({round(len(pixel_2_low)/(wms[0].shape[0]*wms[0].shape[1])*100, 2)}%).
+            \tMin    px value: {np.min(pixel_2_low)}
+            \tMedian px value: {np.median(pixel_2_low)}
+            \tMax    px value: {np.max(pixel_2_low)}""")
 
     # Si tous les poids sont nuls, alors le poids de chaque pixel sera réparti entre les images
     normalized_wms = [

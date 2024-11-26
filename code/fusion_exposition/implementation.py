@@ -16,7 +16,6 @@ def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
     @params: show: bool, if True, show the weight map of the first image
     @return: [[image (np.array)]] a pyramid of the final image"""
 
-    print("Start weight maps generation")
     wms = get_wms(imgs, power_coef, show=show)
     n_wms = normalize_wms(wms, verbose=show)
 

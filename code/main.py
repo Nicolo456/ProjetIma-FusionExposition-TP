@@ -18,11 +18,11 @@ if __name__ == "__main__":
 
     # ==================================== Open images ==========================================
     # Open an image with numpy, show it with matplotlib
-    # img_m = open_image("img/trans_dams/med_aligned.tiff")
-    # img_o = open_image("img/trans_dams/over_aligned.tiff")
-    # img_u = open_image("img/trans_dams/under_aligned.tiff")
-    # img_mo = open_image("img/trans_dams/med_over_aligned.tiff")
-    # imgs = [img_m, img_o, img_u, img_mo]
+    img_m = open_image("imgs/trans_dams/med_aligned.tiff")
+    img_o = open_image("imgs/trans_dams/over_aligned.tiff")
+    img_u = open_image("imgs/trans_dams/under_aligned.tiff")
+    img_mo = open_image("imgs/trans_dams/med_over_aligned.tiff")
+    imgs = [img_m, img_o, img_u, img_mo]
 
     # nb_floors = 7
     # img_m = upsample_image("img/venise/MeanSat.jpg",
@@ -33,12 +33,12 @@ if __name__ == "__main__":
     #                        two_divisibily_factor=nb_floors)
     # imgs = [img_m, img_o, img_u]
 
-    PATH_DIR = "imgs/foyer/"
-    imgs_path = listdir(PATH_DIR)
+    # PATH_DIR = "imgs/foyer/"
+    # imgs_path = listdir(PATH_DIR)
 
-    imgs = [upsample_image(f"{PATH_DIR}{img_i_path}",
-                           two_divisibily_factor=8) for img_i_path in imgs_path if img_i_path != ".DS_Store"]
-    img_m = imgs[3]
+    # imgs = [upsample_image(f"{PATH_DIR}{img_i_path}",
+    #                        two_divisibily_factor=8) for img_i_path in imgs_path if img_i_path != ".DS_Store"]
+    # img_m = imgs[3]
 
     # ==================================== Fusion or fetch last image ============================
     if not args.reuse:

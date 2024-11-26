@@ -31,8 +31,10 @@ def show_image(img1, img1_title='Original Image', is_im1_grey=False, img2=None, 
             plt.imshow(img1, cmap='gray')
         else:
             plt.imshow(img1)
-
-    plt.show()
+    try:
+        plt.show()
+    except KeyboardInterrupt:
+        print(" KeyboardInterrupt!")
 
 
 def show_image_cv2(im, title="Image"):  # cv2 travaille au format BGR et pas RGB
