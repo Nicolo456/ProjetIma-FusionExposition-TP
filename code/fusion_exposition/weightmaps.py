@@ -1,17 +1,36 @@
 import numpy as np
-from .display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
-from .fs_func import open_image, save_image
+from .display_func import show_image
+from .fs_func import open_image
 from .filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
 from .assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
 
 
-def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
+def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_mask=None, saturation_mask=None, well_exposedness_mask=None, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
     """Return a weight map for an image
     @params: img: image (np.array)
     @return: weight map (np.array)"""
 
-    wm = (contrast_wm ** contrast_power) * (saturation_wm **
-                                            saturation_power) * (well_exposedness_wm ** well_exposedness_power)
+    if contrast_mask is None:
+        contrast_mask = np.ones_like(contrast_wm)
+        print("Warning: contrast_mask is None")
+    if saturation_mask is None:
+        saturation_mask = np.ones_like(saturation_wm)
+        print("Warning: saturation_mask is None")
+    if well_exposedness_mask is None:
+        well_exposedness_mask = np.ones_like(well_exposedness_wm)
+        print("Warning: well_exposedness_mask is None")
+
+    wm = np.ones_like(contrast_wm)
+    for i in range(len(contrast_wm)):
+        for j in range(len(contrast_wm[0])):
+            if contrast_mask[i, j] == 1:
+                wm[i, j] *= (contrast_wm[i, j] ** contrast_power)
+            if saturation_mask[i, j] == 1:
+                wm[i, j] *= (saturation_wm[i, j] **
+                             saturation_power)
+            if well_exposedness_mask[i, j] == 1:
+                wm[i, j] *= (well_exposedness_wm[i, j]
+                             ** well_exposedness_power)
 
     if show == True and img is not None:
         show_image(img, img1_title='Original Image', img2=wm,
@@ -22,10 +41,17 @@ def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=1, s
 
 
 @assert_normalized_image()
-def get_wm(img, power_coef, show=False):
+def get_wm(img, power_coef, show=False, contrast_mask=None, saturation_mask=None, well_exposedness_mask=None):
     """Return a weight map for an image
     @params: img: image (np.array)
     @return: weight map (np.array)"""
+
+    if contrast_mask is None:
+        contrast_mask = np.ones_like(contrast_wm)
+    if saturation_mask is None:
+        saturation_mask = np.ones_like(saturation_mask)
+    if well_exposedness_mask is None:
+        well_exposedness_mask = np.ones_like(well_exposedness_mask)
 
     if is_img_greyscale(img):
         # L'image est en noir et blanc
@@ -33,7 +59,7 @@ def get_wm(img, power_coef, show=False):
         saturation_wm = np.ones_like(img)
         well_exposedness_wm = apply_well_exposedness_filter_grayscale(img)
         wm = calc_wm(
-            contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
+            contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img, contrast_mask=contrast_mask, saturation_mask=saturation_mask, well_exposedness_mask=well_exposedness_mask)
     else:
         # L'image est en couleur
         img_grayscale = apply_grayscale(img)
@@ -44,7 +70,7 @@ def get_wm(img, power_coef, show=False):
         well_exposedness_wm = apply_well_exposedness_filter(
             img, show=show)
         wm = calc_wm(
-            contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img)
+            contrast_wm, saturation_wm, well_exposedness_wm, contrast_power=power_coef[0], saturation_power=power_coef[1], well_exposedness_power=power_coef[2], show=show, img=img, contrast_mask=contrast_mask, saturation_mask=saturation_mask, well_exposedness_mask=well_exposedness_mask)
     return wm
 
 
@@ -58,17 +84,61 @@ def get_wms(imgs, power_coef, show=False):
     @return: [image (np.array)] a list of weight map"""
 
     wms = []
+    contrast_mask, saturation_mask, well_exposedness_mask = get_masks(
+        imgs, show=show)
+
     for img in imgs:
-        wms.append(get_wm(img, power_coef, show=show))
+        wms.append(get_wm(img, power_coef, show=show, contrast_mask=contrast_mask,
+                   saturation_mask=saturation_mask, well_exposedness_mask=well_exposedness_mask))
+
     return wms
+
+
+def get_masks(imgs, show=False):
+    """Return a list of weight maps for each image"""
+    contrast_wms = []
+    saturation_wms = []
+    well_exposedness_wms = []
+    for img in imgs:
+        img_grayscale = apply_grayscale(img)
+
+        # Compute the weight map, for each filter we want to normalize it between 0 and 1
+        contrast_wms.append(apply_contrast_filter(img_grayscale, show=show))
+        saturation_wms.append(apply_saturation_filter(img, show=show))
+        well_exposedness_wms.append(apply_well_exposedness_filter(
+            img, show=show))
+
+    px_sum_contrast_wm = np.sum(contrast_wms, axis=0)
+    px_sum_saturation_wm = np.sum(saturation_wms, axis=0)
+    px_sum_well_exposedness_wm = np.sum(well_exposedness_wms, axis=0)
+
+    epsilon = 3e-3
+    contrast_mask = np.where(
+        px_sum_contrast_wm < epsilon, 0, 1).astype(np.uint8)
+    saturation_mask = np.where(
+        px_sum_saturation_wm < epsilon, 0, 1).astype(np.uint8)
+    well_exposedness_mask = np.where(
+        px_sum_well_exposedness_wm < epsilon, 0, 1).astype(np.uint8)
+
+    # inspect_list_structure(contrast_mask, "contrast_mask")
+    # print(f"contrast_mask: {contrast_mask}")
+    # print(f"min of contrast_mask: {np.min(contrast_mask)}")
+    # inspect_list_structure(saturation_mask, "saturation_mask")
+    # print(f"saturation_mask: {saturation_mask}")
+    # print(f"min of saturation_mask: {np.min(saturation_mask)}")
+    # inspect_list_structure(well_exposedness_mask, "well_exposedness_mask")
+    # print(f"well_exposedness_mask: {well_exposedness_mask}")
+    # print(f"min of well_exposedness_mask: {np.min(well_exposedness_mask)}")
+
+    return contrast_mask, saturation_mask, well_exposedness_mask
 
 
 @assert_normalized_images()
 def normalize_wms(wms, verbose=False):
     """Normalize the weight map resultant of the fusion of all 3 filters.
-    @params: wms: [image (np.array)] a list of weight map
+    @params: wms: [image(np.array)] a list of weight map
     @params: verbose: bool, if True, print the sum of the weight map
-    @return: [image (np.array)] a list of normalized weight map"""
+    @return: [image(np.array)] a list of normalized weight map"""
 
     # Epsilon is a small value to avoid division by zero
     epsilon = 1e-10 * np.ones_like(wms[0])
@@ -92,9 +162,9 @@ def normalize_wms(wms, verbose=False):
 @assert_normalized_images(2, negative=True)
 def fuse_and_sum_images(imgs, normalized_wms):
     """Fusionner et sommed les images en utilisant les poids normalisés
-    @params: imgs: [image (np.array)] a list of image with different exposure
-    @params: normalized_wms: [image (np.array)] a list of normalized weight map
-    @return: image (np.array) the fused image"""
+    @params: imgs: [image(np.array)] a list of image with different exposure
+    @params: normalized_wms: [image(np.array)] a list of normalized weight map
+    @return: image(np.array) the fused image"""
 
     if is_img_greyscale(imgs[0]):
         fused_image = np.sum(
@@ -118,9 +188,9 @@ def fuse_and_sum_images(imgs, normalized_wms):
 @assert_normalized_images()
 def naive_fusion(imgs, power_coef, show=False):
     """Naive fusion of images
-    @params: imgs: [image (np.array)] a list of image with different exposure
+    @params: imgs: [image(np.array)] a list of image with different exposure
     @params: show: bool, if True, show the weight map of the first image
-    @return: image (np.array) the fused image"""
+    @return: image(np.array) the fused image"""
 
     wms = get_wms(imgs, power_coef, show=show)
 
