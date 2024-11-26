@@ -10,10 +10,10 @@ def assert_normalized_image(nb_image=1, negative=False):
                     image, np.ndarray) and image.dtype == np.float32, "Input must be a NumPy array of float32."
                 if negative:
                     assert np.all((image >= -1) & (image <= 1)
-                                  ), "Image must be normalized with values in [-1, 1]."
+                                  ), f"Image must be normalized with values in [-1, 1]. here image have values in ({np.min(image)},{np.max(image)})"
                 else:
                     assert np.all((image >= 0) & (
-                        image <= 1)), "Image must be normalized with values in [0, 1]."
+                        image <= 1)), f"Image must be normalized with values in [0, 1]. here image have values in ({np.min(image)},{np.max(image)})"
             return func(*args, **kwargs)
         return wrapper
     return decorator
@@ -29,10 +29,10 @@ def assert_normalized_images(nb_images=1, negative=False):
                         image, np.ndarray) and image.dtype == np.float32, "Input must be a NumPy array of float32."
                     if negative:
                         assert np.all(
-                            (image >= -1) & (image <= 1)), "Image must be normalized with values in [-1, 1]."
+                            (image >= -1) & (image <= 1)), f"Image must be normalized with values in [-1, 1]. here image have values in ({np.min(image)},{np.max(image)})"
                     else:
                         assert np.all((image >= 0) & (
-                            image <= 1)), "Image must be normalized with values in [0, 1]."
+                            image <= 1)), f"Image must be normalized with values in [0, 1]. here image have values in ({np.min(image)},{np.max(image)})"
             return func(*args, **kwargs)
         return wrapper
     return decorator
@@ -51,10 +51,10 @@ def assert_normalized_pyr(nb_pyr=1, negative=False):
                         floor_img, np.ndarray) and floor_img.dtype == np.float32, "Input must be a NumPy array of float32."
                     if negative:
                         assert np.all((floor_img >= -1) & (floor_img <= 1)
-                                      ), "Image must be normalized with values in [-1, 1]."
+                                      ), f"Image must be normalized with values in [-1, 1]. here image have values in ({np.min(floor_img)},{np.max(floor_img)})"
                     else:
                         assert np.all((floor_img >= 0) & (
-                            floor_img <= 1)), "Image must be normalized with values in [0, 1]."
+                            floor_img <= 1)), f"Image must be normalized with values in [0, 1]. here image have values in ({np.min(floor_img)},{np.max(floor_img)})"
             return func(*args, **kwargs)
         return wrapper
     return decorator
@@ -75,10 +75,10 @@ def assert_normalized_pyrs(nb_pyrs=1, negative=False):
                             floor_img, np.ndarray) and floor_img.dtype == np.float32, "Input must be a NumPy array of float32."
                         if negative:
                             assert np.all((floor_img >= -1) & (floor_img <= 1)
-                                          ), "Image must be normalized with values in [-1, 1]."
+                                          ), f"Image must be normalized with values in [-1, 1]. here image have values in ({np.min(floor_img)},{np.max(floor_img)})"
                         else:
                             assert np.all((floor_img >= 0) & (
-                                floor_img <= 1)), "Image must be normalized with values in [0, 1]."
+                                floor_img <= 1)), f"Image must be normalized with values in [0, 1]. here image have values in ({np.min(floor_img)},{np.max(floor_img)})"
             return func(*args, **kwargs)
         return wrapper
     return decorator
@@ -102,7 +102,8 @@ def get_max_floor_if_floor_Max(func):
             while imgs[0].shape[0] % 2**i == 0 and imgs[0].shape[1] % 2**i == 0:
                 i += 1
             n_floors = i - 1
-            print(f"Le nombre de niveaux de la pyramide est : {n_floors}")
+            print(
+                f"[INFO] Le nombre de niveaux de la pyramide est : {n_floors}")
         return func(imgs, n_floors, *args, **kwargs)
     return wrapper
 

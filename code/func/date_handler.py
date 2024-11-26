@@ -1,13 +1,15 @@
 import re
 from datetime import datetime
+import time
+
 
 def date_format_to_regex(date_format):
     """
     Convertit un format de date en une expression régulière.
-    
+
     Args:
         date_format (str): Format de date compatible avec `datetime.strptime`.
-    
+
     Returns:
         str: Expression régulière correspondante.
     """
@@ -27,20 +29,22 @@ def date_format_to_regex(date_format):
         regex = regex.replace(re.escape(key), value)
     return regex
 
+
 def get_latest_file(files, date_format):
     """
     Récupère le fichier avec la date la plus récente.
-    
+
     Args:
         files (list of str): Liste des noms de fichiers.
         date_format (str): Format de la date dans les noms de fichiers.
-        
+
     Returns:
         str: Nom du fichier avec la date la plus récente.
     """
     # Expression régulière pour extraire la date
-    date_regex = re.compile(date_format_to_regex(date_format))  # Par défaut YYYY-MM-DD
-    
+    date_regex = re.compile(date_format_to_regex(
+        date_format))  # Par défaut YYYY-MM-DD
+
     latest_file = None
     latest_date = None
 
@@ -51,5 +55,16 @@ def get_latest_file(files, date_format):
             if latest_date is None or file_date > latest_date:
                 latest_date = file_date
                 latest_file = file
-    
+
     return latest_file
+
+
+def time_counter(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()  # Record start time
+        result = func(*args, **kwargs)  # Execute the function
+        end_time = time.time()  # Record end time
+        print(f"Execution time of {func.__name__}: {
+              end_time - start_time:.6f} seconds")
+        return result
+    return wrapper

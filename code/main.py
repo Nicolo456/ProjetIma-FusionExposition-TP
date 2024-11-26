@@ -5,7 +5,7 @@ from fusion_exposition.implementation import get_exposition_fused_image
 from fusion_exposition.display_func import show_image
 from image_formating.image_transform import unsharp_mask
 from func.arg_parser import init_arg_parser
-from func.date_handler import get_latest_file
+from func.date_handler import get_latest_file, time_counter
 from os import listdir
 from image_formating.downsampling import upsample_image
 
@@ -44,10 +44,14 @@ if __name__ == "__main__":
     if not args.reuse:
         # [contrast_power, saturation_power, well_exposedness_power]
         # When the power augments, it will more effect the weight map, if the coefficient is 0, it will not effect the weight map.
-        power_coef = [1, 1, 5]
+        power_coef = [5, 5, 5]
 
-        final_image = get_exposition_fused_image(
-            imgs, "Max", power_coef, show=False)
+        @time_counter
+        def timed_fusion():
+            return get_exposition_fused_image(
+                imgs, "Max", power_coef, show=False)
+
+        final_image = timed_fusion()
 
         # Save the image into the logs folder
         current_time = datetime.now().strftime(DATE_FORMAT)

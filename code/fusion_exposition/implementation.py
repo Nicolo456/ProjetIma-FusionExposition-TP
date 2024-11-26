@@ -16,14 +16,16 @@ def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
     @params: show: bool, if True, show the weight map of the first image
     @return: [[image (np.array)]] a pyramid of the final image"""
 
+    print("Start weight maps generation")
     wms = get_wms(imgs, power_coef, show=show)
+    n_wms = normalize_wms(wms, verbose=show)
 
     imgs_pyrl = [laplacian_pyramid(
         img, floors=floors, show=show) for img in imgs]
     sorted_imgs_pyrsl = sort_pyr(imgs_pyrl)
 
-    wms_pyrg = [pyramid_down(wm, floors=floors) for wm in wms]
-    sorted_n_wms_pyrs = get_sorted_n_wms_pyrs(wms_pyrg)
+    n_wms_pyrg = [pyramid_down(n_wm, floors=floors) for n_wm in n_wms]
+    sorted_n_wms_pyrs = get_sorted_n_wms_pyrs(n_wms_pyrg)
 
     fused_summed_pyr = get_fused_summed_pyr(
         sorted_n_wms_pyrs, sorted_imgs_pyrsl)
@@ -56,7 +58,8 @@ def get_sorted_n_wms_pyrs(wms_pyrs):
     @param: wms_pyrs: [[image (np.array)]] a list of pyramid for each weight_map
     @return: [[image (np.array)]] a list of floor_group with normalised weight map of the floor (one by pyramid)"""
     sorted_wms_pyrs = sort_pyr(wms_pyrs)
-    sorted_n_wms_pyrs = list(map(normalize_wms, sorted_wms_pyrs))
+    sorted_n_wms_pyrs = sorted_wms_pyrs
+    # sorted_n_wms_pyrs = list(map(normalize_wms, sorted_wms_pyrs))
     return sorted_n_wms_pyrs
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-from .display_func import show_image
+from .display_func import inspect_list_structure, show_image
 from .fs_func import open_image
 from .filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
 from .assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
@@ -21,16 +21,26 @@ def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_mask=None,
         print("Warning: well_exposedness_mask is None")
 
     wm = np.ones_like(contrast_wm)
-    for i in range(len(contrast_wm)):
-        for j in range(len(contrast_wm[0])):
-            if contrast_mask[i, j] == 1:
-                wm[i, j] *= (contrast_wm[i, j] ** contrast_power)
-            if saturation_mask[i, j] == 1:
-                wm[i, j] *= (saturation_wm[i, j] **
-                             saturation_power)
-            if well_exposedness_mask[i, j] == 1:
-                wm[i, j] *= (well_exposedness_wm[i, j]
-                             ** well_exposedness_power)
+    # for i in range(len(contrast_wm)):
+    #     for j in range(len(contrast_wm[0])):
+    #         if contrast_mask[i, j] == 1:
+    #             wm[i, j] *= (contrast_wm[i, j] ** contrast_power)
+    #         if saturation_mask[i, j] == 1:
+    #             wm[i, j] *= (saturation_wm[i, j] **
+    #                          saturation_power)
+    #         if well_exposedness_mask[i, j] == 1:
+    #             wm[i, j] *= (well_exposedness_wm[i, j]
+    #                          ** well_exposedness_power)
+
+    # Optimized version
+    # Assuming all inputs are numpy arrays
+    # Apply contrast weights
+    wm[contrast_mask == 1] *= contrast_wm[contrast_mask == 1] ** contrast_power
+    # Apply saturation weights
+    wm[saturation_mask == 1] *= saturation_wm[saturation_mask == 1] ** saturation_power
+    # Apply well-exposedness weights
+    wm[well_exposedness_mask == 1] *= well_exposedness_wm[well_exposedness_mask ==
+                                                          1] ** well_exposedness_power
 
     if show == True and img is not None:
         show_image(img, img1_title='Original Image', img2=wm,
@@ -112,7 +122,7 @@ def get_masks(imgs, show=False):
     px_sum_saturation_wm = np.sum(saturation_wms, axis=0)
     px_sum_well_exposedness_wm = np.sum(well_exposedness_wms, axis=0)
 
-    epsilon = 3e-3
+    epsilon = 2e-2
     contrast_mask = np.where(
         px_sum_contrast_wm < epsilon, 0, 1).astype(np.uint8)
     saturation_mask = np.where(
@@ -144,6 +154,7 @@ def normalize_wms(wms, verbose=False):
     epsilon = 1e-10 * np.ones_like(wms[0])
 
     px_sum_wms = np.sum(wms, axis=0)
+    print("pixel under 1e-10:", px_sum_wms[px_sum_wms < 1e-10])
 
     # Si tous les poids sont nuls, alors le poids de chaque pixel sera réparti entre les images
     normalized_wms = [
