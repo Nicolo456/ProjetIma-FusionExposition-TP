@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+
 def compute_hist(img):
     """ATTENTION: travail avec des ints entre 0 et 255"""
     # Convert the image to grayscale (if it's not already)
@@ -30,7 +31,7 @@ def match_histogram_to_cdf(image, reference_cdf):
 def correct_hist_grayscale(imgs, final_image):
     """ATTENTION: travail avec des ints entre 0 et 255
     travail avec des images grayscale (un channel)"""
-    # Calculate histograms for all 4 images
+    # Calculate histograms for all images
     hists = [compute_hist(img) for img in imgs]
 
     # Calculate the mean histogram

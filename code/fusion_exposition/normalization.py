@@ -54,20 +54,3 @@ def normalise_vector_decorator(force_normalize_return=False, quantile_loss=1):
             return n_res
         return wrapper
     return decorator
-
-
-def normalise_laplacian_pyr(func):
-    """Extend normalise_decorator to a pyramid of images"""
-    def wrapper(*args, **kwargs):
-        res_pyr = func(*args, **kwargs)
-        n_res_pyr = []
-        for img_floor in res_pyr:
-            if np.max(img_floor) == np.min(img_floor):
-                n_img_floor = np.zeros_like(img_floor)
-            else:
-                n_img_floor = (img_floor - np.min(img_floor)) / \
-                    (np.max(img_floor) - np.min(img_floor))
-
-                n_res_pyr.append(n_img_floor)
-        return n_res_pyr
-    return wrapper

@@ -65,7 +65,7 @@ def get_wms(imgs, power_coef, show=False):
 
 @assert_normalized_images()
 def normalize_wms(wms, verbose=False):
-    """Normalize the weight map
+    """Normalize the weight map resultant of the fusion of all 3 filters.
     @params: wms: [image (np.array)] a list of weight map
     @params: verbose: bool, if True, print the sum of the weight map
     @return: [image (np.array)] a list of normalized weight map"""
@@ -73,11 +73,11 @@ def normalize_wms(wms, verbose=False):
     # Epsilon is a small value to avoid division by zero
     epsilon = 1e-10 * np.ones_like(wms[0])
 
-    px_sum_wms = np.sum(wms, axis=0) + epsilon
+    px_sum_wms = np.sum(wms, axis=0)
 
     # Si tous les poids sont nuls, alors le poids de chaque pixel sera réparti entre les images
     normalized_wms = [
-        np.divide(wm + epsilon/len(wms), px_sum_wms) for wm in wms]
+        np.divide(wm, px_sum_wms) for wm in wms]
 
     if verbose:
         print("\nSum of Normalized weight maps:")

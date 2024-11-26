@@ -18,7 +18,9 @@ def apply_contrast_filter(img_grayscale, show=False):
     This yields a simple indicator C for contrast. It tends to assign a high weight to important elements such as edges and texture.
     A similar measure was used for multi-focus fusion for extended depth-of-field [19]'''
 
-    laplacian_filtered = ndimage.laplace(img_grayscale)
+    # On floute pour enlever le bruit
+    blurred = ndimage.gaussian_filter(img_grayscale, sigma=1)
+    laplacian_filtered = ndimage.laplace(blurred)
     laplacian_filtered = np.absolute(laplacian_filtered)
     # if np.max(np.abs(laplacian_filtered)) > 1:
     #     print("laplacian_filtered normalized for image:", laplacian_filtered.shape,

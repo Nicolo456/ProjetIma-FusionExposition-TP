@@ -1,7 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
 from .display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
-from .normalization import normalise_laplacian_pyr
 from .assert_decorator import assert_normalized_pyr
 
 
@@ -92,7 +91,8 @@ def laplacian_pyramid(im, floors=3, show=False):
     pyr_up = pyramid_up(last_floor, floors=floors)
 
     for i in range(floors-1):
-        lapl_im = cv2.subtract(pyr_down[i], pyr_up[floors-i-1])
+        lapl_im = cv2.subtract(pyr_down[i], cv2.resize(
+            pyr_up[floors - i - 1], (pyr_down[i].shape[1], pyr_down[i].shape[0])))
         pyr.append(lapl_im)
         if show:
             show_image_cv2(lapl_im)
