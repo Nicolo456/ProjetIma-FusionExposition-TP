@@ -8,8 +8,9 @@ from func.arg_parser import init_arg_parser
 from func.date_handler import get_latest_file, time_counter
 from os import listdir
 from image_formating.downsampling import upsample_image
+from os.path import join
 
-LOGS_FOLDER = "hidden_imgs/logs/"
+LOGS_FOLDER = join("hidden_imgs", "logs")
 LOGS_SAVE_NAME = "final_image"
 DATE_FORMAT = "%Y-%m-%d:%H-%M-%S"
 CURRENT_TIME = datetime.now().strftime(DATE_FORMAT)
@@ -45,22 +46,22 @@ if __name__ == "__main__":
     if not args.reuse:
         # [contrast_power, saturation_power, well_exposedness_power]
         # When the power augments, it will more effect the weight map, if the coefficient is 0, it will not effect the weight map.
-        power_coef = [1, 10, 1]
+        power_coef = [7, 1, 1]
 
         @time_counter
         def timed_fusion():
             return get_exposition_fused_image(
-                imgs, "Max", power_coef, show=True)
+                imgs, "Max", power_coef, show=False)
 
         final_image = timed_fusion()
 
         # Save the image into the logs folder
         save_image(
-            final_image, f"{LOGS_FOLDER}{LOGS_SAVE_NAME}_{CURRENT_TIME}.tiff")
+            final_image, f"{join(LOGS_FOLDER, LOGS_SAVE_NAME)}_{CURRENT_TIME}.tiff")
     else:
         # On réouvre la dernière image enregistrée
         final_image_name = get_latest_file(listdir(LOGS_FOLDER), DATE_FORMAT)
-        final_image = open_image(f"{LOGS_FOLDER}{final_image_name}")
+        final_image = open_image(f"{join(LOGS_FOLDER, final_image_name)}")
 
     # ==================================== Show Result ========================================
     show_image(final_image, img1_title='Final image')
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     show_image(final_image, img1_title='Final image sharp',
                img2=previous_final_image, img2_title='Final image')
     save_image(
-        final_image, f"{LOGS_FOLDER}{LOGS_SAVE_NAME}_sharp_{CURRENT_TIME}.tiff")
+        final_image, f"{join(LOGS_FOLDER, LOGS_SAVE_NAME)}_sharp_{CURRENT_TIME}.tiff")
 
     # ==================================== If flag apply transform ============================
     if args.exposition:
@@ -87,22 +88,22 @@ if __name__ == "__main__":
         show_image(corrected_hist_final_image,
                    img1_title='Corrected hist hsv Final image')
         save_image(
-            corrected_hist_final_image, f"{LOGS_FOLDER}{LOGS_SAVE_NAME}_sharp_hsv_{CURRENT_TIME}.tiff")
+            corrected_hist_final_image, f"{join(LOGS_FOLDER, LOGS_SAVE_NAME)}_sharp_hsv_{CURRENT_TIME}.tiff")
 
         corrected_hist_final_image = correct_hist_hsv([img_m], final_image)
         show_image(corrected_hist_final_image,
                    img1_title='Corrected hist for med hsv Final image')
         save_image(
-            corrected_hist_final_image, f"{LOGS_FOLDER}{LOGS_SAVE_NAME}_sharp_hsv_med_{CURRENT_TIME}.tiff")
+            corrected_hist_final_image, f"{join(LOGS_FOLDER, LOGS_SAVE_NAME)}_sharp_hsv_med_{CURRENT_TIME}.tiff")
 
         # ============================== CLAHE ==============================
         clahe_final_image = apply_clahe_hsv(final_image)
         show_image(clahe_final_image, img1_title='CLAHE Final image')
         save_image(
-            clahe_final_image, f"{LOGS_FOLDER}{LOGS_SAVE_NAME}_CLAHE_{CURRENT_TIME}.tiff")
+            clahe_final_image, f"{join(LOGS_FOLDER, LOGS_SAVE_NAME)}_CLAHE_{CURRENT_TIME}.tiff")
 
         # ============================== SATURATION ==============================
         sat_final_image = add_saturation(final_image)
         show_image(sat_final_image, img1_title='SATURATION Final image')
         save_image(
-            sat_final_image, f"{LOGS_FOLDER}{LOGS_SAVE_NAME}_Saturation_{CURRENT_TIME}.tiff")
+            sat_final_image, f"{join(LOGS_FOLDER, LOGS_SAVE_NAME)}_Saturation_{CURRENT_TIME}.tiff")
