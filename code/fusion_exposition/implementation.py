@@ -94,7 +94,7 @@ def get_exposition_fused_image(imgs, floors, power_coef, show=False, clip=True):
 
     # Execute the wrapper for the pyramid
     fused_summed_pyr = make_fused_summed_pyr(
-        imgs, power_coef, show=False, floors=floors)
+        imgs, power_coef, show=show, floors=floors)
 
     final_image = reconstruct_from_lpyr(fused_summed_pyr)
 

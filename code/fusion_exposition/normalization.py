@@ -21,7 +21,7 @@ def normalise_decorator(func):
     return wrapper
 
 
-def normalise_vector_decorator(force_normalize_return=False, quantile_loss=1):
+def normalise_vector_decorator(force_normalize_return=False, quantile_loss=0):
     """Extend normalise_decorator to a list of images"""
     def decorator(func):
         def wrapper(imgs, *args, **kwargs):
@@ -40,9 +40,11 @@ def normalise_vector_decorator(force_normalize_return=False, quantile_loss=1):
                 max_with_loss = np.percentile(
                     res, 100 - quantile_loss)  # 90ème percentile
                 # On oublie les valeurs trop basses et trop hautes
+                n_res = res / (1 + res)
                 n_res = ((res - min_with_loss) / (max_with_loss -
                          min_with_loss)).astype(np.float32)
                 n_res = np.clip(n_res, 0, 1)
+
             else:
                 n_res = res.astype(np.float32)
 

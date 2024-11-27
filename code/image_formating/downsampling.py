@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 
-def downsample_image(image_path, lambda_factor, two_divisibily_factor=0):
+def downsample_image(image_path, lambda_factor, two_divisibily_factor=0, save=True):
     """Downsample an image by a given factor.
     Args:
         image_path (str): Chemin vers l'image à sous-échantillonner.
@@ -26,16 +26,19 @@ def downsample_image(image_path, lambda_factor, two_divisibily_factor=0):
     downsampled_img = img.resize(
         (new_width, new_height), Image.Resampling.LANCZOS)
 
-    # Sépare le nom de fichier et son extension
-    base, ext = os.path.splitext(image_path)
+    if save:
+        # Sépare le nom de fichier et son extension
+        base, ext = os.path.splitext(image_path)
 
-    # Crée le nouveau nom de fichier avec "_downsampled"
-    new_image_path = f"{base}_downsampled{ext}"
+        # Crée le nouveau nom de fichier avec "_downsampled"
+        new_image_path = f"{base}_downsampled{ext}"
 
-    # Enregistre l'image sous-échantillonnée
-    downsampled_img.save(new_image_path)
+        # Enregistre l'image sous-échantillonnée
+        downsampled_img.save(new_image_path)
 
-    print(f"Image enregistrée sous: {new_image_path}")
+        print(f"Image enregistrée sous: {new_image_path}")
+    else:
+        return downsampled_img
 
 
 def upsample_image(image_path, two_divisibily_factor=0):

@@ -122,7 +122,7 @@ def get_masks(imgs, show=False):
     px_sum_saturation_wm = np.sum(saturation_wms, axis=0)
     px_sum_well_exposedness_wm = np.sum(well_exposedness_wms, axis=0)
 
-    epsilon = 5e-2
+    epsilon = 1e-2
     contrast_mask = np.where(
         px_sum_contrast_wm < epsilon, 0, 1).astype(np.uint8)
     saturation_mask = np.where(
@@ -146,7 +146,6 @@ def normalize_wms(wms, verbose=False):
     pixel_2_low = px_sum_wms[px_sum_wms < epsilon]
 
     if len(pixel_2_low) > 0:
-        # For deactivate automatic formatting
         print(f"""[WARNING] Sum of weight maps to low (under {epsilon}). {len(pixel_2_low)}/{wms[0].shape[0]*wms[0].shape[1]} pixel(s) counted ({round(len(pixel_2_low)/(wms[0].shape[0]*wms[0].shape[1])*100, 2)}%).
             \tMin    px value: {np.min(pixel_2_low)}
             \tMedian px value: {np.median(pixel_2_low)}
@@ -203,21 +202,23 @@ def naive_fusion(imgs, power_coef, show=False):
 
     n_wms = normalize_wms(wms, verbose=show)
 
-    fused_image = fuse_and_sum_images(imgs, n_wms, forceInt=True)
+    fused_image = fuse_and_sum_images(imgs, n_wms)
 
     return fused_image
 
 
 if __name__ == "__main__":
     # Open an image with numpy, show it with matplotlib
-    img_m = open_image("img/trans_dams/med_aligned.tiff")
-    img_o = open_image("img/trans_dams/over_aligned.tiff")
-    img_u = open_image("img/trans_dams/under_aligned.tiff")
+    img_m = open_image("imgs/trans_dams/med_aligned.tiff")
+    img_o = open_image("imgs/trans_dams/over_aligned.tiff")
+    img_u = open_image("imgs/trans_dams/under_aligned.tiff")
 
-    img_m = open_image("img/venise/MeanSat.jpg")
-    img_o = open_image("img/venise/OverSat.jpg")
-    img_u = open_image("img/venise/UnderSat.jpg")
+    img_m = open_image("hidden_imgs/venise/MeanSat.jpg")
+    img_o = open_image("hidden_imgs/venise/OverSat.jpg")
+    img_u = open_image("imhidden_imgsg/venise/UnderSat.jpg")
     imgs = [img_m, img_o, img_u]
 
+    imgs = [(img/255).astype(np.float32) for img in imgs]
     fused_image = naive_fusion(imgs, power_coef=[1, 1, 1], show=False)
+    fused_image = (fused_image * 255).astype(np.uint8)
     show_image(fused_image)

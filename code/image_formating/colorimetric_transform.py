@@ -101,11 +101,26 @@ def apply_clahe_hsv(img):
     # Split the YUV image into its channels
     h, s, v = cv2.split(hsv_img)
     # Apply CLAHE to the Y channel
-    s_clahe = apply_clahe_grey(s, clipLimit=1.0)
-    v_clahe = apply_clahe_grey(v)
+    s_clahe = apply_clahe_grey(s, clipLimit=0.5)
+    v_clahe = apply_clahe_grey(v, clipLimit=0.5)
 
     # Merge the enhanced Y channel with the original U and V channels
     enhanced_hsv_img = cv2.merge((h, s_clahe, v_clahe))
+    # Convert the image back to BGR color space
+    enhanced_img = cv2.cvtColor(enhanced_hsv_img, cv2.COLOR_HSV2BGR)
+    return enhanced_img
+
+
+def add_saturation(img, saturation_factor=1.8, value_factor=1.2):
+    # Convert the image to HSV color space
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    # Split the HSV image into its channels
+    h, s, v = cv2.split(hsv_img)
+    # Apply saturation adjustment
+    s = np.clip(s * saturation_factor, 0, 255).astype(np.uint8)
+    v = np.clip(v * value_factor, 0, 255).astype(np.uint8)
+    # Merge the enhanced saturation channel with the original H and V channels
+    enhanced_hsv_img = cv2.merge((h, s, v))
     # Convert the image back to BGR color space
     enhanced_img = cv2.cvtColor(enhanced_hsv_img, cv2.COLOR_HSV2BGR)
     return enhanced_img
