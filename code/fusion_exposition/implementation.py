@@ -1,7 +1,7 @@
 import numpy as np
 from .display_func import show_image, inspect_list_structure
 from .weightmaps import get_wms, normalize_wms, fuse_and_sum_images
-from .pyramid import pyramid_down, reconstruct_from_lpyr, laplacian_pyramid
+from .pyramid import pyramid_gaussienne, reconstruct_from_lpyr, laplacian_pyramid
 from .normalization import normalise_vector_decorator
 from .assert_decorator import assert_normalized_images, assert_normalized_pyrs, assert_image_size_divisible, get_max_floor_if_floor_Max
 
@@ -28,7 +28,7 @@ def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
         img, floors=floors, show=show) for img in imgs]
     sorted_imgs_pyrsl = sort_pyr(imgs_pyrl)
 
-    n_wms_pyrg = [pyramid_down(n_wm, floors=floors) for n_wm in n_wms]
+    n_wms_pyrg = [pyramid_gaussienne(n_wm, floors=floors) for n_wm in n_wms]
     sorted_n_wms_pyrs = get_sorted_n_wms_pyrs(n_wms_pyrg)
 
     fused_summed_pyr = get_fused_summed_pyr(

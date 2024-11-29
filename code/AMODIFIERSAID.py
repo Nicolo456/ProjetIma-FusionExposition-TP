@@ -19,7 +19,7 @@ if __name__ == "__main__":
     is_naive_fusion: booléen, si True, utilise la fusion naïve, sinon utilise la fusion avec les poids
      """
     result = get_compressed_image(
-        imgs, [1, 1, 1], args, is_naive_fusion=True)  # Ne pas modifier args
+        imgs, [1, 1, 1], args, is_naive_fusion=False)  # Ne pas modifier args
     show_image(result, img1_title='Resultat final')  # Montre l'image
     # ----------------------------------------------------------------------------------------
 

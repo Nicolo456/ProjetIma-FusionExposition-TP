@@ -9,7 +9,7 @@ Ce module contient des fonctions permettant de:
 - reconstruire une image à partir d'une pyramide"""
 
 
-def pyramid_down(im, floors=3, show=False):
+def pyramid_gaussienne(im, floors=3, show=False):
     """
         Construct an image pyramid by downsampling.
 
@@ -89,7 +89,7 @@ def laplacian_pyramid(im, floors=3, show=False):
     Returns:
         list: Laplacian pyramid levels.
     """
-    pyr_down = pyramid_down(im, floors=floors)
+    pyr_down = pyramid_gaussienne(im, floors=floors)
 
     last_floor = pyr_down[floors-1]
     pyr = []
@@ -108,6 +108,6 @@ def laplacian_pyramid(im, floors=3, show=False):
 if __name__ == "__main__":
     img = cv2.imread('C:/Damien/Cours/Telecom Paris/Cours_2A/IMA/4IM01/depot_Nico/code/imgs/foyer/3med.tiff')
     laplacian_pyramid(img, 5, show=True)
-    pyr_down = pyramid_down(img, 4, True)
+    pyr_down = pyramid_gaussienne(img, 4, True)
     N = len(pyr_down)
     pyr_up = pyramid_up(pyr_down[N-1], 4, show=True)
