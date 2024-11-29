@@ -18,3 +18,14 @@ Il a été développé dans le cadre du cours CSC_4IM01_TP de la filière IMA de
 ## Description
 
 Nous avons ajouté une description en haut de chaque fichier pour expliquer ce qu'il contient.
+
+### Abréviation
+
+Petit dictionnaire des abréviations utilisées dans le code :
+
+- Dès qu'il y a un 's' à la fin c'est qu'on parle d'un vecteur de l'objet de base
+  _Exemple_ : `img` pour une image, `imgs` pour une liste d'images, `imgss` pour une liste de liste d'images.
+- `wm` pour weight map
+- `n_` pour dire que l'objet est normalisé
+  _Exemple_ : `n_img` pour une image normalisée
+- `sorted_` pour dire que l'objet est trié. Dans le cas des pyramides gaussiennes cela signifie que chaque element de la liste est une liste contenant le même niveau des différentes pyramides. => Utiliser la fonction `inspect_list_structure` pour visualiser (dans le package `fusion_exposition.inspect_list_structure`)
