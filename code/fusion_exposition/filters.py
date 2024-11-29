@@ -3,6 +3,10 @@ from scipy import ndimage
 from .display_func import show_image
 from .assert_decorator import assert_normalized_image
 
+"""
+Ce module contient des fonctions permettant de:
+- convertir une image en niveau de gris
+- appliquer les filtres de contraste, saturation et bonne-exposition"""
 
 @assert_normalized_image(negative=True)
 def apply_grayscale(img):

@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 from .display_func import show_image, show_image_cv2, BGR2RGB, RGB2BGR, inspect_list_structure
 from .assert_decorator import assert_normalized_pyr
 
+"""
+Ce module contient des fonctions permettant de:
+- construire une pyramide d'images (laplacienne ou gaussienne)
+- reconstruire une image à partir d'une pyramide"""
+
 
 def pyramid_down(im, floors=3, show=False):
     """
@@ -101,7 +106,7 @@ def laplacian_pyramid(im, floors=3, show=False):
 
 
 if __name__ == "__main__":
-    img = cv2.imread('img/venise/MeanSat.jpg')
+    img = cv2.imread('C:/Damien/Cours/Telecom Paris/Cours_2A/IMA/4IM01/depot_Nico/code/imgs/foyer/3med.tiff')
     laplacian_pyramid(img, 5, show=True)
     pyr_down = pyramid_down(img, 4, True)
     N = len(pyr_down)

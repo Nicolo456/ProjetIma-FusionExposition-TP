@@ -6,6 +6,11 @@ from .normalization import normalise_vector_decorator
 from .assert_decorator import assert_normalized_images, assert_normalized_pyrs, assert_image_size_divisible, get_max_floor_if_floor_Max
 
 
+"""
+Ce module contient les fonctions permettant de:
+- fusionner des images en utilisant la méthode de fusion d'exposition
+- fusionner des images en utilisant la méthode de fusion d'exposition avec des pyramides"""
+
 @assert_normalized_images()
 def make_fused_summed_pyr(imgs, power_coef, show=False, floors=3):
     """Wrapper used to generate the final pyramid like the paper

@@ -2,6 +2,13 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 
+"""
+Ce module contient des fonctions permettant de:
+- afficher des images au format RGB et BGR
+- convertir une image du format RGB à BGR
+- afficher la structure d'une liste à plusieurs dimensions
+- afficher la différence de deux images"""
+
 
 def show_image(img1, img1_title='Original Image', is_im1_grey=False, img2=None, img2_title='Filtered Image', is_im2_grey=False):
     if img2 is not None:
@@ -86,6 +93,14 @@ def inspect_list_structure(lst, name=None, level=0, isExit=False):
 
     if level == 0 and isExit:
         exit(0)
+
+if __name__ == "__main__":
+    # Example usage
+    example_list = [
+        np.random.rand(64, 64, 3).astype(np.float64),
+        [np.random.rand(28, 28).astype(np.float64), np.random.rand(28, 28).astype(np.float64)],
+        42,]
+    inspect_list_structure(example_list)
 
 
 def show_difference(img1, img2, title="Difference"):

@@ -8,6 +8,11 @@ from .fs_func import open_image
 from .filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
 from .assert_decorator import assert_normalized_images, assert_normalized_image, is_img_greyscale
 
+"""
+Ce module contient des fonctions permettant de:
+- calculer les cartes de poids pour une image
+- executer la méthode de fusion naïve présentée dans notre compte rendu"""
+
 
 def calc_wm(contrast_wm, saturation_wm, well_exposedness_wm, contrast_mask=None, saturation_mask=None, well_exposedness_mask=None, contrast_power=1, saturation_power=1, well_exposedness_power=1, show=False, img=None):
     """Return a weight map for an image
