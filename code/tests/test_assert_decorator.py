@@ -1,11 +1,11 @@
 # To import from a file in the parent directory
-from ..fusion_exposition.assert_decorator import assert_normalized_image, assert_normalized_images
 import numpy as np
-import pytest
 import sys
 import os
+# fmt: off
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+from fusion_exposition.assert_decorator import assert_normalized_image, assert_normalized_images
+# fmt: on
 # Verify that work with a greyscale image and a colored image
 # Test the assert_normalized_image decorator
 

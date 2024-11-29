@@ -1,4 +1,8 @@
+from os import listdir
 import numpy as np
+
+from .normalization import normalise_vector_decorator
+
 from .display_func import inspect_list_structure, show_image
 from .fs_func import open_image
 from .filters import apply_contrast_filter, apply_grayscale, apply_saturation_filter, apply_well_exposedness_filter, apply_well_exposedness_filter_grayscale
@@ -122,7 +126,7 @@ def get_masks(imgs, show=False):
     px_sum_saturation_wm = np.sum(saturation_wms, axis=0)
     px_sum_well_exposedness_wm = np.sum(well_exposedness_wms, axis=0)
 
-    epsilon = 1e-2
+    epsilon = 1e-1
     contrast_mask = np.where(
         px_sum_contrast_wm < epsilon, 0, 1).astype(np.uint8)
     saturation_mask = np.where(
@@ -151,9 +155,12 @@ def normalize_wms(wms, verbose=False):
             \tMedian px value: {np.median(pixel_2_low)}
             \tMax    px value: {np.max(pixel_2_low)}""")
 
+    epsilon = 1e-30 * np.ones_like(wms[0])
+    px_sum_wms = np.sum(wms, axis=0) + epsilon
+
     # Si tous les poids sont nuls, alors le poids de chaque pixel sera réparti entre les images
     normalized_wms = [
-        np.divide(wm, px_sum_wms) for wm in wms]
+        np.divide(wm + epsilon/len(wms), px_sum_wms) for wm in wms]
 
     if verbose:
         print("\nSum of Normalized weight maps:")
@@ -191,6 +198,7 @@ def fuse_and_sum_images(imgs, normalized_wms):
     return fused_image
 
 
+@normalise_vector_decorator(force_normalize_return=True)
 @assert_normalized_images()
 def naive_fusion(imgs, power_coef, show=False):
     """Naive fusion of images

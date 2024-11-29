@@ -1,6 +1,6 @@
 import os
 from PIL import Image
-from downsampling import downsample_image
+from .downsampling import downsample_image
 
 if __name__ == "__main__":
     # Chemin du dossier contenant les images .tiff
