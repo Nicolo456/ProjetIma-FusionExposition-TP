@@ -1,6 +1,8 @@
 # Simple decorator used to normalize the image in entry and exit of the function
 import numpy as np
 
+"""
+Ce modele contient des décorateurs permettant de normaliser les images"""
 
 def normalise_decorator(func):
     """Decorator used to normalize the image in entry and return an image with 255 values"""

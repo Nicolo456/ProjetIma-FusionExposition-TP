@@ -1,5 +1,12 @@
 import numpy as np
 
+"""
+Ce module contient différents décorateurs qui permettent de vérifier les points suivants:
+- vérifier qu'une/des images/pyramides sont bien normalisées
+- vérifier que la taille d'une image est bien divisible par 2^(d'étages)
+- executer la fonction avec la valeur maximale de nombre d'étages
+- vérifier que l'image est en niveau de gris """
+
 
 def assert_normalized_image(nb_image=1, negative=False):
     def decorator(func):
